@@ -1,0 +1,57 @@
+name: Bug report
+description: Something is broken in setup-gmat.
+labels: ['type:bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. The more concrete you can be, the faster this gets fixed.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the failure. Include the exact error message if you have one.
+    validations:
+      required: true
+  - type: textarea
+    id: workflow
+    attributes:
+      label: Workflow snippet
+      description: The workflow steps that exercised the action. Trim to the smallest reproducible block.
+      render: yaml
+    validations:
+      required: true
+  - type: input
+    id: action-version
+    attributes:
+      label: setup-gmat version
+      description: The `@vN` or `@vN.N.N` ref you used in `uses:`.
+      placeholder: 'v1'
+    validations:
+      required: true
+  - type: input
+    id: gmat-version
+    attributes:
+      label: GMAT version
+      placeholder: 'R2026a'
+    validations:
+      required: true
+  - type: dropdown
+    id: runner-os
+    attributes:
+      label: Runner OS
+      options:
+        - ubuntu-latest
+        - ubuntu-22.04
+        - ubuntu-24.04
+        - windows-latest
+        - macos-latest
+        - other (note in description)
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Action log excerpt
+      description: Paste the relevant lines from the failed step. A link to a public run is also fine.
+      render: shell
