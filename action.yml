@@ -1,0 +1,33 @@
+name: 'Setup GMAT'
+description: 'Install NASA GMAT and bootstrap gmatpy for use in CI.'
+author: 'astro-tools'
+
+branding:
+  icon: 'cpu'
+  color: 'blue'
+
+inputs:
+  version:
+    description: 'GMAT release to install (e.g. R2026a). v0.1 supports R2026a only on Linux.'
+    required: false
+    default: 'R2026a'
+  cache:
+    description: 'Cache the GMAT install across runs via actions/cache.'
+    required: false
+    default: 'true'
+  python-version:
+    description: 'Optional. Python interpreter to use for BuildApiStartupFile.py. If empty, the python on PATH is used.'
+    required: false
+    default: ''
+
+outputs:
+  gmat-root:
+    description: 'Absolute path to the resolved GMAT install root.'
+  gmat-version:
+    description: 'GMAT release that was installed.'
+  cache-hit:
+    description: 'Whether the install was restored from cache. "true" or "false".'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'

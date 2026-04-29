@@ -1,0 +1,22 @@
+name: Feature request
+description: Propose a capability for setup-gmat.
+labels: ['type:feature']
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What's the problem?
+      description: What can you not do today, or what would the action need to do for you to adopt it?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed shape
+      description: How might this look from the workflow author's perspective? Inputs, outputs, behavior.
+      render: yaml
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Workarounds, other actions, or external tools you've tried or considered.

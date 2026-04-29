@@ -1,0 +1,41 @@
+{
+  "name": "setup-gmat",
+  "version": "0.0.0",
+  "private": true,
+  "description": "GitHub Action to install NASA GMAT (General Mission Analysis Tool) and bootstrap gmatpy in CI.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "ncc build src/main.ts -o dist --minify --license licenses.txt",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "all": "npm run format:check && npm run lint && npm run typecheck && npm run build"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/astro-tools/setup-gmat.git"
+  },
+  "bugs": "https://github.com/astro-tools/setup-gmat/issues",
+  "homepage": "https://github.com/astro-tools/setup-gmat#readme",
+  "dependencies": {
+    "@actions/cache": "^4.0.0",
+    "@actions/core": "^1.11.1",
+    "@actions/exec": "^1.1.1",
+    "@actions/io": "^1.1.3",
+    "@actions/tool-cache": "^2.0.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.14.0",
+    "@types/node": "^20.17.0",
+    "@vercel/ncc": "^0.38.2",
+    "eslint": "^9.14.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.13.0"
+  }
+}
