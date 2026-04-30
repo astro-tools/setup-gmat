@@ -14,7 +14,7 @@ GitHub Action for installing [NASA GMAT](https://gmat.gsfc.nasa.gov/) (General M
 
 ## Status
 
-v0.1 is the first usable release. It installs GMAT R2026a on Linux runners, caches the install across runs, and exports `GMAT_ROOT` to the workflow environment. Additional runners (Windows, macOS) and the R2022a–R2025a version matrix are tracked under v0.2; see the [Roadmap](#roadmap) below.
+setup-gmat installs GMAT (R2022a, R2025a, or R2026a) on Linux runners, caches the install across runs, and exports `GMAT_ROOT` to the workflow environment. Windows and macOS runner support is tracked under a future milestone; see the [Roadmap](#roadmap) below.
 
 ## What it does
 
@@ -32,11 +32,11 @@ v0.1 is the first usable release. It installs GMAT R2026a on Linux runners, cach
 | --------------- | ------------ |
 | `ubuntu-latest` | R2026a       |
 
-The action pulls GMAT's generic Linux x86_64 build, so other Linux runners with a recent glibc should work — but `ubuntu-latest` is the only configuration exercised in CI for v0.1. Windows and macOS runners, and the R2022a / R2025a versions, are scoped for v0.2.
+The action pulls GMAT's generic Linux x86_64 build, so other Linux runners with a recent glibc should work — but `ubuntu-latest` is the only configuration currently exercised in CI. Windows and macOS runner support is tracked under a future milestone.
 
 ## Quick start
 
-A complete workflow that installs GMAT, runs `gmatpy`, and is shaped as a matrix so it expands cleanly when v0.2 adds more versions:
+A complete workflow that installs GMAT, runs `gmatpy`, and is shaped as a matrix so it scales to multiple versions cleanly:
 
 ```yaml
 name: gmat-ci

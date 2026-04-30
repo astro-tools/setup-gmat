@@ -1,8 +1,9 @@
 import * as core from '@actions/core';
 
-export type GmatVersion = 'R2026a';
+export type GmatVersion = 'R2022a' | 'R2025a' | 'R2026a';
 
-export const SUPPORTED_VERSIONS: readonly GmatVersion[] = ['R2026a'];
+// NASA never released R2023a or R2024a — there are no SourceForge artifacts for those years.
+export const SUPPORTED_VERSIONS: readonly GmatVersion[] = ['R2022a', 'R2025a', 'R2026a'];
 
 export interface Inputs {
   version: GmatVersion;

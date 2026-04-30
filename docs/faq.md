@@ -24,9 +24,9 @@ The key is **not** sensitive to the action's minor or patch version, the upstrea
 
 ## Which GMAT versions are supported?
 
-v0.1 supports **R2026a only**, on Linux runners. Any other value for `version` raises a validation error at parse time, before any download.
+The action installs **R2022a, R2025a, or R2026a** on Linux runners. Any other value for `version` raises a validation error at parse time, before any download.
 
-The v0.2 milestone expands support to **R2022a, R2025a, and R2026a** across Linux, Windows, and macOS. NASA never released R2023a or R2024a — there are no SourceForge tarballs for those versions, and they will not appear in any version matrix this action ships.
+NASA never released R2023a or R2024a — there are no SourceForge tarballs for those versions, and they will not appear in any version matrix this action ships. Windows and macOS runner support is tracked under a future milestone.
 
 ## Why does `python -c "import gmatpy"` fail in a step after `setup-gmat`?
 
@@ -48,4 +48,4 @@ For local use, install GMAT directly from [SourceForge](https://sourceforge.net/
 
 ## Does setup-gmat verify the download?
 
-It checks the archive size against a hardcoded minimum (≈380 MiB for R2026a) before extraction, which catches truncated downloads and SourceForge HTML-mirror responses. It does **not** verify a checksum or signature in v0.1 — supply-chain hardening (cosign-signed Docker image, attested provenance) is on the v0.3 roadmap.
+It checks the archive size against a hardcoded per-version minimum (e.g. ≈380 MiB for R2026a) before extraction, which catches truncated downloads and SourceForge HTML-mirror responses. It does **not** verify a checksum or signature in v0.1 — supply-chain hardening (cosign-signed Docker image, attested provenance) is on the v0.3 roadmap.

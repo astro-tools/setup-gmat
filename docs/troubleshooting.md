@@ -16,7 +16,7 @@ Before extraction, the action sanity-checks the downloaded archive against a har
 - **Network interruption mid-download.** The error fires fast, before extraction; safe to re-run.
 - **Upstream pulled the release.** If retries don't help, the SourceForge URL may have changed or the tarball may have been replaced. Open an issue.
 
-The threshold (≈380 MiB for R2026a) is hardcoded; a download below it is treated as failure regardless of whether extraction would have succeeded.
+The per-version threshold (e.g. ≈380 MiB for R2026a) is hardcoded; a download below it is treated as failure regardless of whether extraction would have succeeded.
 
 ## `python` is not on `PATH`
 
@@ -61,7 +61,7 @@ GMAT_ROOT: /home/runner/work/_temp/gmat.
 See the workflow log above for gmatpy's stderr.
 ```
 
-After installing, the action loads and runs a stock sample (`Ex_HighFidelitySRP.script`) end-to-end as proof that `gmatpy` is callable. A failure here means the install is broken in a way `BuildApiStartupFile.py` did not catch — typically a missing shared library or an ABI/Python mismatch that only surfaces at first `gmat.Setup()`.
+After installing, the action loads and runs a stock high-fidelity SRP sample end-to-end as proof that `gmatpy` is callable. A failure here means the install is broken in a way `BuildApiStartupFile.py` did not catch — typically a missing shared library or an ABI/Python mismatch that only surfaces at first `gmat.Setup()`.
 
 Read the stderr above the error for the underlying gmatpy / GMAT message. If you see a missing-shared-library error (e.g. `libGmatBase.so` failing to load), check whether a custom runner image is interfering with the cached install — passing `cache: false` and re-running is the fastest diagnostic.
 
@@ -73,7 +73,7 @@ but /tmp/.../GMAT/R2026a/api/BuildApiStartupFile.py is missing.
 Did the upstream archive layout change?
 ```
 
-`setup-gmat` resolves `GMAT_ROOT` by an exact path inside the tarball (`GMAT/<version>/`). If NASA changes the layout in a future release, this error fires immediately rather than producing a half-installed tree. v0.1 is pinned to R2026a, whose layout is stable. If you see this error against R2026a, the tarball is either corrupt locally or has been replaced upstream — open an issue.
+`setup-gmat` resolves `GMAT_ROOT` by an exact path inside the tarball (`GMAT/<version>/`). If NASA changes the layout in a future release, this error fires immediately rather than producing a half-installed tree. The wrapper layout has been stable across the supported versions, so if you hit this against a supported `version`, the tarball is either corrupt locally or has been replaced upstream — open an issue.
 
 ## Cache restore differs from a fresh install
 

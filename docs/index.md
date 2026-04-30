@@ -13,7 +13,7 @@ A GitHub Action that installs [NASA GMAT](https://gmat.gsfc.nasa.gov/) and boots
 
 ## Status
 
-v0.1 is the first usable release: GMAT R2026a on Linux runners (`ubuntu-latest`), caching across runs, and a built-in smoke check that loads and runs a stock GMAT sample. Windows and macOS support and the R2022a–R2026a version matrix are scoped for v0.2; see the [README roadmap](https://github.com/astro-tools/setup-gmat#roadmap) for the full plan.
+setup-gmat installs GMAT (R2022a, R2025a, or R2026a) on Linux runners (`ubuntu-latest`), caches across runs, and runs a built-in smoke check that loads and runs a stock GMAT sample. Windows and macOS runner support is tracked under a future milestone; see the [README roadmap](https://github.com/astro-tools/setup-gmat#roadmap) for the full plan.
 
 ## Where to next
 

@@ -1,6 +1,6 @@
 # Getting started
 
-This page walks through the minimum CI workflow that installs GMAT R2026a and runs your own `gmatpy` code on top of it.
+This page walks through the minimum CI workflow that installs GMAT and runs your own `gmatpy` code on top of it.
 
 ## Prerequisites
 
@@ -29,7 +29,7 @@ When this step finishes, the job has:
 
 - GMAT installed under `$GMAT_ROOT` (`$RUNNER_TEMP/gmat`), exported into the workflow environment.
 - `gmatpy` available at `$GMAT_ROOT/bin/gmatpy/` and registered against the active Python ABI by `BuildApiStartupFile.py`.
-- An action-internal smoke check that has already loaded and run a stock GMAT sample (`samples/Ex_HighFidelitySRP.script`), so a successful step is positive proof the install is callable.
+- An action-internal smoke check that has already loaded and run a stock high-fidelity SRP sample, so a successful step is positive proof the install is callable.
 
 ## Calling gmatpy from your own steps
 
