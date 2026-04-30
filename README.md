@@ -16,7 +16,7 @@ docker run --rm -it ghcr.io/astro-tools/gmat:R2026a python -c "import gmatpy"
 
 ## Status
 
-Under active development. The v0.1 install path is not implemented yet — invoking the action today fails with an explicit "not implemented" message. Track progress in the [setup-gmat development project](https://github.com/orgs/astro-tools/projects/5).
+Under active development. The v0.1 install path is not implemented yet — invoking the action today fails with an explicit "not implemented" message.
 
 ## What it does (planned)
 
@@ -36,8 +36,6 @@ Under active development. The v0.1 install path is not implemented yet — invok
 | v0.2       | Windows + macOS, R2022a–R2026a matrix, weekly self-CI cron.                  |
 | v0.3       | Docker image on GHCR, semantic-release wired up, cosign image signing.       |
 | v1.0       | Public API stability; at least two external consumers shipped on the action. |
-
-See the project [charter](https://github.com/astro-tools/setup-gmat/blob/main/docs/charter.md) for the longer-form scope and acceptance criteria. _(Charter source lives in `files/projects/setup-gmat-charter.docx` for now and will be ported to docs in a follow-up.)_
 
 ## License
 

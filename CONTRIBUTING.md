@@ -51,7 +51,7 @@ Feature and fix PRs do **not** edit `CHANGELOG.md`. The release-cut PR aggregate
 
 ## Scope discipline
 
-setup-gmat's scope is deliberately narrow: install GMAT and prove `gmatpy` imports. Mission running, output parsing, and astrodynamics validation belong in sibling projects (`gmat-run`, `astro-validate`). Before opening a feature issue, check the [charter](https://github.com/astro-tools/setup-gmat) and existing issues to make sure the work belongs here.
+setup-gmat's scope is deliberately narrow: install GMAT and prove `gmatpy` imports. Mission running, output parsing, and astrodynamics validation belong in sibling projects (`gmat-run`, `astro-validate`). Before opening a feature issue, check existing issues to make sure the work belongs here.
 
 ## Questions
 

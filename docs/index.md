@@ -17,4 +17,4 @@ docker run --rm -it ghcr.io/astro-tools/gmat:R2026a python -c "import gmatpy"
 
 ## Status
 
-setup-gmat is under active development. The action is not yet usable; see the [project board](https://github.com/orgs/astro-tools/projects/5) for v0.1 progress.
+setup-gmat is under active development. The action is not yet usable.
