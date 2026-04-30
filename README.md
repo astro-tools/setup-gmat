@@ -14,7 +14,7 @@ GitHub Action for installing [NASA GMAT](https://gmat.gsfc.nasa.gov/) (General M
 
 ## Status
 
-setup-gmat installs GMAT (R2022a, R2025a, or R2026a) on Linux runners, caches the install across runs, and exports `GMAT_ROOT` to the workflow environment. Windows and macOS runner support is tracked under a future milestone; see the [Roadmap](#roadmap) below.
+setup-gmat installs GMAT (R2022a, R2025a, or R2026a) on Linux and Windows runners, caches the install across runs, and exports `GMAT_ROOT` to the workflow environment. macOS runner support is tracked under a future milestone; see the [Roadmap](#roadmap) below.
 
 ## What it does
 
@@ -26,13 +26,14 @@ setup-gmat installs GMAT (R2022a, R2025a, or R2026a) on Linux runners, caches th
 
 `actions/setup-python` (or any equivalent that puts `python` on PATH) is a prerequisite — setup-gmat does not bundle its own Python interpreter.
 
-## Supported versions (v0.1)
+## Supported versions
 
-| Runner          | GMAT version |
-| --------------- | ------------ |
-| `ubuntu-latest` | R2026a       |
+| Runner           | GMAT versions          |
+| ---------------- | ---------------------- |
+| `ubuntu-latest`  | R2022a, R2025a, R2026a |
+| `windows-latest` | R2022a, R2025a, R2026a |
 
-The action pulls GMAT's generic Linux x86_64 build, so other Linux runners with a recent glibc should work — but `ubuntu-latest` is the only configuration currently exercised in CI. Windows and macOS runner support is tracked under a future milestone.
+The action pulls GMAT's generic Linux x86_64 build on Linux runners (other Linux runners with a recent glibc should work) and the Windows x86_64 build on Windows runners. `ubuntu-latest` is the only configuration currently exercised in CI; cross-platform self-CI across all supported runner OSes is tracked under a future milestone. macOS runner support is also tracked under a future milestone.
 
 ## Quick start
 
@@ -79,7 +80,7 @@ Full documentation lives at **<https://astro-tools.github.io/setup-gmat/>** — 
 | Release          | Scope                                                                        |
 | ---------------- | ---------------------------------------------------------------------------- |
 | v0.1 _(current)_ | Linux + R2026a, basic caching, smoke check.                                  |
-| v0.2             | Windows + macOS, R2022a–R2026a matrix, weekly self-CI cron.                  |
+| v0.2             | Linux + Windows, R2022a/R2025a/R2026a; macOS and weekly self-CI cron next.   |
 | v0.3             | Docker image on GHCR, semantic-release wired up, cosign image signing.       |
 | v1.0             | Public API stability; at least two external consumers shipped on the action. |
 

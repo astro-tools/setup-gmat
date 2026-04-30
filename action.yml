@@ -8,7 +8,7 @@ branding:
 
 inputs:
   version:
-    description: 'GMAT release to install. Supported values: R2022a, R2025a, R2026a (Linux only).'
+    description: 'GMAT release to install. Supported values: R2022a, R2025a, R2026a.'
     required: false
     default: 'R2026a'
   cache:
