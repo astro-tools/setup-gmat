@@ -81,7 +81,7 @@ If your `.script` file uses `Create ReportFile` resources to write its own outpu
 os.chdir(REPORTS)
 ```
 
-The samples shipped in `$GMAT_ROOT/samples/` are documented in the GMAT user guide; their paths and resource names are stable across R2026a. See [Inputs and outputs → Install path and layout](../inputs-outputs.md#install-path-and-layout) for the full directory map.
+The samples shipped in `$GMAT_ROOT/samples/` are documented in the GMAT user guide. Stock filenames are mostly stable across releases but not guaranteed — R2026a, for example, renamed `Ex_R2014a_HighFidelitySRP.script` to `Ex_HighFidelitySRP.script`. See [Inputs and outputs → Install path and layout](../inputs-outputs.md#install-path-and-layout) for the full directory map.
 
 ## Common failures
 
