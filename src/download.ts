@@ -25,6 +25,15 @@ const WINDOWS_MIN_SIZE_BYTES: Record<GmatVersion, number> = {
   R2026a: 380 * MIB,
 };
 
+// R2026a's signed DMG is ~455 MiB; 400 MiB matches the charter floor and
+// gmat-run's working CI threshold. R2022a/R2025a floors are conservative
+// truncation guards — the actual archives are larger.
+const MACOS_MIN_SIZE_BYTES: Record<GmatVersion, number> = {
+  R2022a: 350 * MIB,
+  R2025a: 380 * MIB,
+  R2026a: 400 * MIB,
+};
+
 export async function download(version: GmatVersion): Promise<string> {
   const spec = installerSpec(detectRunnerOs(), version);
   core.info(`Downloading GMAT ${version} ${spec.archiveLabel} from ${spec.url}`);
@@ -47,6 +56,12 @@ function installerSpec(runnerOs: RunnerOs, version: GmatVersion): InstallerSpec 
         url: `https://sourceforge.net/projects/gmat/files/GMAT/GMAT-${version}/gmat-win-${version}.zip/download`,
         minBytes: WINDOWS_MIN_SIZE_BYTES[version],
         archiveLabel: 'Windows installer',
+      };
+    case 'macos':
+      return {
+        url: `https://sourceforge.net/projects/gmat/files/GMAT/GMAT-${version}/gmat-mac-x64-${version}-signed.dmg/download`,
+        minBytes: MACOS_MIN_SIZE_BYTES[version],
+        archiveLabel: 'macOS installer',
       };
   }
 }
