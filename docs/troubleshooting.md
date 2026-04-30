@@ -32,7 +32,7 @@ Add a 'uses: actions/setup-python@v5' step before setup-gmat.
   with:
     python-version: '3.12'
 
-- uses: astro-tools/setup-gmat@v0.1
+- uses: astro-tools/setup-gmat@v0
 ```
 
 The `python-version` input on `setup-gmat` itself is informational and does **not** select the interpreter — see [Inputs and outputs](inputs-outputs.md#inputs).

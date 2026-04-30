@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - uses: astro-tools/setup-gmat@v0.1
+      - uses: astro-tools/setup-gmat@v0
         with:
           version: R2026a
 

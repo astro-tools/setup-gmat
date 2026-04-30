@@ -20,7 +20,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - uses: astro-tools/setup-gmat@v0.1
+      - uses: astro-tools/setup-gmat@v0
         with:
           version: R2026a
 ```
@@ -67,7 +67,7 @@ This pattern is more portable than `PYTHONPATH` because it travels with the scri
 
 ```yaml
 - id: gmat
-  uses: astro-tools/setup-gmat@v0.1
+  uses: astro-tools/setup-gmat@v0
   with:
     version: R2026a
 

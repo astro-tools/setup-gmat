@@ -6,7 +6,7 @@ A GitHub Action that installs [NASA GMAT](https://gmat.gsfc.nasa.gov/) and boots
 - uses: actions/setup-python@v5
   with:
     python-version: '3.12'
-- uses: astro-tools/setup-gmat@v0.1
+- uses: astro-tools/setup-gmat@v0
   with:
     version: R2026a
 ```

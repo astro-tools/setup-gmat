@@ -6,7 +6,7 @@ GitHub Action for installing [NASA GMAT](https://gmat.gsfc.nasa.gov/) (General M
 - uses: actions/setup-python@v5
   with:
     python-version: '3.12'
-- uses: astro-tools/setup-gmat@v0.1
+- uses: astro-tools/setup-gmat@v0
   with:
     version: R2026a
     cache: true
@@ -58,7 +58,7 @@ jobs:
           python-version: '3.12'
 
       - id: gmat
-        uses: astro-tools/setup-gmat@v0.1
+        uses: astro-tools/setup-gmat@v0
         with:
           version: ${{ matrix.gmat-version }}
           cache: true
