@@ -7,7 +7,7 @@ Thanks for your interest. This page is the one place to learn the workflow.
 ```bash
 git clone https://github.com/astro-tools/setup-gmat.git
 cd setup-gmat
-nvm use   # picks up .nvmrc → Node 20
+nvm use   # picks up .nvmrc → Node 24
 npm ci
 ```
 
