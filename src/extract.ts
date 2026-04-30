@@ -1,19 +1,19 @@
 import { existsSync } from 'node:fs';
-import { readdir } from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import * as core from '@actions/core';
 import * as io from '@actions/io';
 import * as tc from '@actions/tool-cache';
+import type { GmatVersion } from './inputs';
 
 const API_STARTUP_FILE = path.join('api', 'BuildApiStartupFile.py');
 
-export async function extract(archivePath: string): Promise<string> {
+export async function extract(archivePath: string, version: GmatVersion): Promise<string> {
   core.info(`Extracting GMAT installer ${archivePath}`);
   const stagingDir = await tc.extractTar(archivePath);
   core.debug(`Extracted to ${stagingDir}`);
 
-  const stagedRoot = await locateGmatRoot(stagingDir);
+  const stagedRoot = locateGmatRoot(stagingDir, version);
   core.debug(`Resolved staged GMAT_ROOT: ${stagedRoot}`);
 
   const finalRoot = path.join(runnerTemp(), 'gmat');
@@ -26,21 +26,15 @@ export async function extract(archivePath: string): Promise<string> {
   return finalRoot;
 }
 
-async function locateGmatRoot(stagingDir: string): Promise<string> {
-  if (existsSync(path.join(stagingDir, API_STARTUP_FILE))) {
-    return stagingDir;
-  }
-  const entries = await readdir(stagingDir, { withFileTypes: true });
-  for (const entry of entries) {
-    if (!entry.isDirectory()) continue;
-    const candidate = path.join(stagingDir, entry.name);
-    if (existsSync(path.join(candidate, API_STARTUP_FILE))) {
-      return candidate;
-    }
+function locateGmatRoot(stagingDir: string, version: GmatVersion): string {
+  const expectedRoot = path.join(stagingDir, 'GMAT', version);
+  if (existsSync(path.join(expectedRoot, API_STARTUP_FILE))) {
+    return expectedRoot;
   }
   throw new Error(
-    `Could not locate ${API_STARTUP_FILE} under ${stagingDir}. ` +
-      `The installer archive layout may have changed.`,
+    `Expected GMAT/${version}/${API_STARTUP_FILE} inside the installer, ` +
+      `but ${path.join(expectedRoot, API_STARTUP_FILE)} is missing. ` +
+      `Did the upstream archive layout change?`,
   );
 }
 

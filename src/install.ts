@@ -35,7 +35,9 @@ async function resolveInstall(inputs: Inputs): Promise<{ gmatRoot: string; cache
   const archive = await core.group(`Download GMAT ${inputs.version}`, () =>
     download(inputs.version),
   );
-  const gmatRoot = await core.group('Extract GMAT installer', () => extract(archive));
+  const gmatRoot = await core.group('Extract GMAT installer', () =>
+    extract(archive, inputs.version),
+  );
 
   if (inputs.cache) {
     await core.group('Save GMAT cache', () => saveCache(inputs.version, gmatRoot));
