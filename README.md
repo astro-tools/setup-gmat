@@ -10,7 +10,6 @@ GitHub Action for installing [NASA GMAT](https://gmat.gsfc.nasa.gov/) (General M
   with:
     version: R2026a
     cache: true
-- run: python -c "import gmatpy"
 ```
 
 ## Status
@@ -63,9 +62,6 @@ jobs:
         with:
           version: ${{ matrix.gmat-version }}
           cache: true
-
-      - name: Smoke check gmatpy
-        run: python -c "import gmatpy; print(gmatpy.__file__)"
 
       - name: Show install metadata
         run: |
