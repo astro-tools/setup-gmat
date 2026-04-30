@@ -24,7 +24,7 @@ function parseVersion(raw: string): GmatVersion {
     return value;
   }
   throw new Error(
-    `Unsupported GMAT version "${value}". Supported versions in v0.1: ${SUPPORTED_VERSIONS.join(', ')}.`,
+    `Unsupported GMAT version "${value}". Supported versions: ${SUPPORTED_VERSIONS.join(', ')}.`,
   );
 }
 
