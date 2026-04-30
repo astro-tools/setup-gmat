@@ -33,7 +33,7 @@ setup-gmat installs GMAT (R2022a, R2025a, or R2026a) on Linux and Windows runner
 | `ubuntu-latest`  | R2022a, R2025a, R2026a |
 | `windows-latest` | R2022a, R2025a, R2026a |
 
-The action pulls GMAT's generic Linux x86_64 build on Linux runners (other Linux runners with a recent glibc should work) and the Windows x86_64 build on Windows runners. `ubuntu-latest` is the only configuration currently exercised on every PR; `windows-latest` is exercised through a manual `workflow_dispatch` harness. macOS runner support is tracked under a future milestone.
+The action pulls GMAT's generic Linux x86_64 build on Linux runners (other Linux runners with a recent glibc should work) and the Windows x86_64 build on Windows runners. `ubuntu-latest` is the only configuration currently exercised in CI; cross-platform self-CI across all supported runner OSes is tracked under a future milestone. macOS runner support is also tracked under a future milestone.
 
 ## Quick start
 
