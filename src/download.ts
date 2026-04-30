@@ -6,6 +6,8 @@ import type { GmatVersion } from './inputs';
 const MIB = 1024 * 1024;
 
 const MIN_SIZE_BYTES: Record<GmatVersion, number> = {
+  R2022a: 360 * MIB,
+  R2025a: 390 * MIB,
   R2026a: 380 * MIB,
 };
 
