@@ -38,7 +38,7 @@ A PR that only touches `**.md` or anything under `docs/**` is now skipped entire
 
 ## The inverse — docs-only jobs
 
-For a separate workflow that builds docs and should *only* run on docs changes, use `paths` (the inverse of `paths-ignore`):
+For a separate workflow that builds docs and should _only_ run on docs changes, use `paths` (the inverse of `paths-ignore`):
 
 ```yaml
 name: docs
@@ -69,7 +69,7 @@ This pattern keeps the docs build off the critical path of every code PR while s
 
 ## Required-status-check gotcha
 
-If branch protection requires the GMAT-install workflow as a status check, a `paths-ignore`-skipped run produces *no* status — not a passing one — which can block PRs from merging. Two common fixes:
+If branch protection requires the GMAT-install workflow as a status check, a `paths-ignore`-skipped run produces _no_ status — not a passing one — which can block PRs from merging. Two common fixes:
 
 - **Drop the requirement** for that workflow if the docs paths are genuinely safe to merge without it.
 - **Add a thin always-runs job** in the same workflow file that produces the required status. The skip filter applies per-workflow, not per-job, but you can split the heavy work into a separate workflow that's `paths-ignore`-filtered while a lightweight workflow with the same required status name runs unconditionally.
