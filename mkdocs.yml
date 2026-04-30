@@ -38,6 +38,9 @@ nav:
   - Inputs and outputs: inputs-outputs.md
   - Recipes:
       - recipes/index.md
+      - Run pytest against gmatpy: recipes/pytest.md
+      - Run a mission script and upload its report: recipes/run-mission-script.md
+      - Skip the GMAT install on docs-only changes: recipes/skip-on-docs.md
   - FAQ: faq.md
   - Troubleshooting: troubleshooting.md
 
