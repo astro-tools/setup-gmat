@@ -2,16 +2,23 @@ import * as path from 'node:path';
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as io from '@actions/io';
+import type { GmatVersion } from './inputs';
 
-const SMOKE_SAMPLE = path.posix.join('samples', 'Ex_HighFidelitySRP.script');
+// R2026a renamed Ex_R2014a_HighFidelitySRP.script to Ex_HighFidelitySRP.script.
+const SMOKE_SAMPLES: Record<GmatVersion, string> = {
+  R2022a: path.posix.join('samples', 'Ex_R2014a_HighFidelitySRP.script'),
+  R2025a: path.posix.join('samples', 'Ex_R2014a_HighFidelitySRP.script'),
+  R2026a: path.posix.join('samples', 'Ex_HighFidelitySRP.script'),
+};
 
-const SMOKE_PYTHON_SRC = `
+function buildSmokePythonSrc(sampleRel: string): string {
+  return `
 import os, sys
 gmat_root = os.environ['GMAT_ROOT']
 sys.path.insert(0, os.path.join(gmat_root, 'bin'))
 import gmatpy as gmat
 gmat.Setup(os.path.join(gmat_root, 'bin', 'api_startup_file.txt'))
-script = os.path.join(gmat_root, ${JSON.stringify(SMOKE_SAMPLE)})
+script = os.path.join(gmat_root, ${JSON.stringify(sampleRel)})
 if not gmat.LoadScript(script):
     sys.exit(f'gmat.LoadScript failed for {script}')
 rc = gmat.RunScript()
@@ -19,10 +26,16 @@ if rc != 1:
     sys.exit(f'gmat.RunScript returned {rc} for {script} (expected 1)')
 print('setup-gmat smoke ok')
 `;
+}
 
-export async function smoke(gmatRoot: string, pythonVersion?: string): Promise<void> {
+export async function smoke(
+  gmatRoot: string,
+  version: GmatVersion,
+  pythonVersion?: string,
+): Promise<void> {
   const pythonPath = await resolvePython();
-  const sample = path.join(gmatRoot, SMOKE_SAMPLE);
+  const sampleRel = SMOKE_SAMPLES[version];
+  const sample = path.join(gmatRoot, sampleRel);
   if (pythonVersion !== undefined) {
     core.info(
       `Smoke-testing GMAT install at ${gmatRoot} with ${pythonPath} (requested python-version=${pythonVersion})`,
@@ -31,7 +44,7 @@ export async function smoke(gmatRoot: string, pythonVersion?: string): Promise<v
     core.info(`Smoke-testing GMAT install at ${gmatRoot} with ${pythonPath}`);
   }
   try {
-    await exec.exec(pythonPath, ['-c', SMOKE_PYTHON_SRC], {
+    await exec.exec(pythonPath, ['-c', buildSmokePythonSrc(sampleRel)], {
       cwd: gmatRoot,
       env: { ...process.env, GMAT_ROOT: gmatRoot } as { [key: string]: string },
     });

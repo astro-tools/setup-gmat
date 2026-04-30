@@ -16,7 +16,7 @@ export async function install(): Promise<void> {
   await core.group('Build api_startup_file.txt', () =>
     buildApiStartupFile(gmatRoot, inputs.pythonVersion),
   );
-  await core.group('Smoke check', () => smoke(gmatRoot, inputs.pythonVersion));
+  await core.group('Smoke check', () => smoke(gmatRoot, inputs.version, inputs.pythonVersion));
 
   core.exportVariable('GMAT_ROOT', gmatRoot);
   core.setOutput('gmat-root', gmatRoot);
