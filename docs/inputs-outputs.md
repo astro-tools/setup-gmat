@@ -28,12 +28,12 @@ GMAT is extracted to `$RUNNER_TEMP/gmat` (the same path is reported as `gmat-roo
 
 Notable paths under `$GMAT_ROOT`:
 
-| Path                         | What's there                                                                               |
-| ---------------------------- | ------------------------------------------------------------------------------------------ |
-| `bin/`                       | GMAT shared libraries, `GmatConsole`, and the `gmatpy` package.                            |
-| `bin/gmatpy/`                | The Python package. Add `bin/` to `PYTHONPATH` or `sys.path` to import it.                 |
-| `bin/api_startup_file.txt`   | Written by `BuildApiStartupFile.py`; passed to `gmat.Setup(...)` before the API is usable. |
-| `api/BuildApiStartupFile.py` | The bootstrap script `setup-gmat` runs after extraction.                                   |
+| Path                         | What's there                                                                                                                    |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `bin/`                       | GMAT shared libraries, `GmatConsole`, and the `gmatpy` package.                                                                 |
+| `bin/gmatpy/`                | The Python package. Add `bin/` to `PYTHONPATH` or `sys.path` to import it.                                                      |
+| `bin/api_startup_file.txt`   | Written by `BuildApiStartupFile.py`; passed to `gmat.Setup(...)` before the API is usable.                                      |
+| `api/BuildApiStartupFile.py` | The bootstrap script `setup-gmat` runs after extraction.                                                                        |
 | `samples/`                   | Stock GMAT mission scripts. The action's smoke check uses the stock high-fidelity SRP sample (filename varies by GMAT release). |
 
 ## Cache key
