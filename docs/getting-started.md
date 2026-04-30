@@ -5,7 +5,7 @@ This page walks through the minimum CI workflow that installs GMAT R2026a and ru
 ## Prerequisites
 
 - A Linux runner. v0.1 is exercised on `ubuntu-latest`; other Linux runners with a recent glibc should work but are not covered by setup-gmat's CI.
-- `python` on `PATH` *before* `setup-gmat` runs. The action shells out to `BuildApiStartupFile.py` and runs an internal smoke check; both invoke whatever Python `which python` resolves. The action does **not** bundle its own interpreter. Use [`actions/setup-python`](https://github.com/actions/setup-python) (or any equivalent) to put one on PATH.
+- `python` on `PATH` _before_ `setup-gmat` runs. The action shells out to `BuildApiStartupFile.py` and runs an internal smoke check; both invoke whatever Python `which python` resolves. The action does **not** bundle its own interpreter. Use [`actions/setup-python`](https://github.com/actions/setup-python) (or any equivalent) to put one on PATH.
 
 ## Minimum workflow
 

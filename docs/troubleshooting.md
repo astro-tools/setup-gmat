@@ -77,4 +77,4 @@ Did the upstream archive layout change?
 
 ## Cache restore differs from a fresh install
 
-This is not an error setup-gmat raises, but it can show up in workflows that snapshot `$GMAT_ROOT` and assert on its contents. The action's own self-test (`.github/workflows/ci.yml`, the `self-test` job) verifies bit-for-bit equivalence between a fresh download and a cache restore for everything *except* `bin/api_startup_file.txt` and `__pycache__/` directories. Drift in those two paths is expected — they're regenerated per Python ABI when `BuildApiStartupFile.py` runs against the restored install.
+This is not an error setup-gmat raises, but it can show up in workflows that snapshot `$GMAT_ROOT` and assert on its contents. The action's own self-test (`.github/workflows/ci.yml`, the `self-test` job) verifies bit-for-bit equivalence between a fresh download and a cache restore for everything _except_ `bin/api_startup_file.txt` and `__pycache__/` directories. Drift in those two paths is expected — they're regenerated per Python ABI when `BuildApiStartupFile.py` runs against the restored install.

@@ -2,18 +2,18 @@
 
 ## Inputs
 
-| Name             | Required | Default  | Description                                                                                                                                                                                  |
-| ---------------- | -------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `version`        | no       | `R2026a` | GMAT release to install. v0.1 supports `R2026a` only. Any other value raises a validation error before the download starts.                                                                  |
-| `cache`          | no       | `true`   | Cache the resolved install across runs via `actions/cache`. Pass `'false'` to force a fresh download every run.                                                                              |
+| Name             | Required | Default  | Description                                                                                                                                                                                       |
+| ---------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `version`        | no       | `R2026a` | GMAT release to install. v0.1 supports `R2026a` only. Any other value raises a validation error before the download starts.                                                                       |
+| `cache`          | no       | `true`   | Cache the resolved install across runs via `actions/cache`. Pass `'false'` to force a fresh download every run.                                                                                   |
 | `python-version` | no       | `''`     | Informational only — the value is logged but does **not** select the interpreter. To pin Python, configure [`actions/setup-python`](https://github.com/actions/setup-python) before `setup-gmat`. |
 
 ## Outputs
 
-| Name           | Description                                                                                  |
-| -------------- | -------------------------------------------------------------------------------------------- |
-| `gmat-root`    | Absolute path to the resolved GMAT install root. Equal to `$RUNNER_TEMP/gmat` in v0.1.       |
-| `gmat-version` | GMAT release that was installed. Echoes the validated `version` input.                       |
+| Name           | Description                                                                                   |
+| -------------- | --------------------------------------------------------------------------------------------- |
+| `gmat-root`    | Absolute path to the resolved GMAT install root. Equal to `$RUNNER_TEMP/gmat` in v0.1.        |
+| `gmat-version` | GMAT release that was installed. Echoes the validated `version` input.                        |
 | `cache-hit`    | `'true'` if the install was restored from cache, `'false'` if downloaded and extracted fresh. |
 
 ## Environment variables
@@ -28,13 +28,13 @@ GMAT is extracted to `$RUNNER_TEMP/gmat` (the same path is reported as `gmat-roo
 
 Notable paths under `$GMAT_ROOT`:
 
-| Path                              | What's there                                                                              |
-| --------------------------------- | ----------------------------------------------------------------------------------------- |
-| `bin/`                            | GMAT shared libraries, `GmatConsole`, and the `gmatpy` package.                            |
-| `bin/gmatpy/`                     | The Python package. Add `bin/` to `PYTHONPATH` or `sys.path` to import it.                |
-| `bin/api_startup_file.txt`        | Written by `BuildApiStartupFile.py`; passed to `gmat.Setup(...)` before the API is usable. |
-| `api/BuildApiStartupFile.py`      | The bootstrap script `setup-gmat` runs after extraction.                                   |
-| `samples/`                        | Stock GMAT mission scripts. The action's smoke check uses `Ex_HighFidelitySRP.script`.     |
+| Path                         | What's there                                                                               |
+| ---------------------------- | ------------------------------------------------------------------------------------------ |
+| `bin/`                       | GMAT shared libraries, `GmatConsole`, and the `gmatpy` package.                            |
+| `bin/gmatpy/`                | The Python package. Add `bin/` to `PYTHONPATH` or `sys.path` to import it.                 |
+| `bin/api_startup_file.txt`   | Written by `BuildApiStartupFile.py`; passed to `gmat.Setup(...)` before the API is usable. |
+| `api/BuildApiStartupFile.py` | The bootstrap script `setup-gmat` runs after extraction.                                   |
+| `samples/`                   | Stock GMAT mission scripts. The action's smoke check uses `Ex_HighFidelitySRP.script`.     |
 
 ## Cache key
 
