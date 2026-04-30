@@ -78,7 +78,7 @@ Full documentation lives at **<https://astro-tools.github.io/setup-gmat/>** — 
 
 | Release          | Scope                                                                        |
 | ---------------- | ---------------------------------------------------------------------------- |
-| v0.1 _(current)_ | Linux + R2026a, basic caching, smoke check, gmat-run CI consumes the action. |
+| v0.1 _(current)_ | Linux + R2026a, basic caching, smoke check.                                  |
 | v0.2             | Windows + macOS, R2022a–R2026a matrix, weekly self-CI cron.                  |
 | v0.3             | Docker image on GHCR, semantic-release wired up, cosign image signing.       |
 | v1.0             | Public API stability; at least two external consumers shipped on the action. |
