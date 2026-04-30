@@ -24,9 +24,9 @@ The key is **not** sensitive to the action's minor or patch version, the upstrea
 
 ## Which GMAT versions are supported?
 
-The action installs **R2022a, R2025a, or R2026a** on Linux runners. Any other value for `version` raises a validation error at parse time, before any download.
+The action installs **R2022a, R2025a, or R2026a** on Linux and Windows runners. Any other value for `version` raises a validation error at parse time, before any download.
 
-NASA never released R2023a or R2024a — there are no SourceForge tarballs for those versions, and they will not appear in any version matrix this action ships. Windows and macOS runner support is tracked under a future milestone.
+NASA never released R2023a or R2024a — there are no SourceForge artifacts for those versions, and they will not appear in any version matrix this action ships. macOS runner support is tracked under a future milestone.
 
 ## Why does `python -c "import gmatpy"` fail in a step after `setup-gmat`?
 
