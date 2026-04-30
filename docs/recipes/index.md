@@ -1,6 +1,6 @@
 # Recipes
 
-Worked-example workflows for common shapes. Each recipe runs as-is on `ubuntu-latest` against `astro-tools/setup-gmat@v0.1` — no external dependencies, no secret-gated steps. Copy, adapt, ship.
+Worked-example workflows for common shapes. Each recipe runs as-is on `ubuntu-latest` against `astro-tools/setup-gmat@v0` — no external dependencies, no secret-gated steps. Copy, adapt, ship.
 
 - [Run pytest against gmatpy](pytest.md) — install GMAT and run a `pytest` suite whose tests `import gmatpy`. Sets `PYTHONPATH` on the test step.
 - [Run a mission script and upload its report](run-mission-script.md) — drive a `.script` file via `gmatpy.LoadScript` / `RunScript` from Python, write a report, and upload it as a build artifact.
