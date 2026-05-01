@@ -51,6 +51,13 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         version: [R2022a, R2025a, R2026a]
+        # macos-latest is Apple Silicon; R2022a's gmatpy ships x86_64-only .so
+        # files (predates Apple Silicon support). Replace that cell with
+        # macos-13 (last x86_64 macOS runner) via exclude+include below.
+        # R2025a/R2026a ship arm64-compatible builds and stay on macos-latest.
+        exclude:
+          - os: macos-latest
+            version: R2022a
         # R2022a's Windows/macOS gmatpy builds ship _py36..._py39 only (Linux
         # adds _py310, but lowest-common-denominator wins). R2025a/R2026a both
         # ship _py312 across every platform.
@@ -61,6 +68,9 @@ jobs:
             python-version: '3.12'
           - version: R2026a
             python-version: '3.12'
+          - os: macos-13
+            version: R2022a
+            python-version: '3.9'
     steps:
       - uses: actions/checkout@v5
 
