@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { existsSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import * as core from '@actions/core';
@@ -113,25 +113,58 @@ async function findApiStartupScript(mountPoint: string): Promise<string> {
 function locateGmatRoot(stagingDir: string, version: GmatVersion, runnerOs: RunnerOs): string {
   // Linux: the tarball wraps in `GMAT/<version>/`. macOS: unpackDmg already
   // resolves the GMAT root inside the mount and copies it to `<staging>/gmat`.
-  // Windows: the zip has no wrapper; install layout sits at the staging root.
-  let expectedRoot: string;
+  // Windows: zip layout varies across releases — R2026a is wrapper-less,
+  // R2022a/R2025a wrap in `GMAT/<version>/` — so probe for BuildApiStartupFile.py
+  // instead of guessing.
   switch (runnerOs) {
     case 'linux':
-      expectedRoot = path.join(stagingDir, 'GMAT', version);
-      break;
+      return verifyExpectedRoot(path.join(stagingDir, 'GMAT', version));
     case 'macos':
-      expectedRoot = path.join(stagingDir, 'gmat');
-      break;
+      return verifyExpectedRoot(path.join(stagingDir, 'gmat'));
     case 'windows':
-      expectedRoot = stagingDir;
-      break;
+      return findRootByApiStartup(stagingDir);
   }
+}
+
+function verifyExpectedRoot(expectedRoot: string): string {
   if (existsSync(path.join(expectedRoot, API_STARTUP_FILE))) {
     return expectedRoot;
   }
   throw new Error(
     `Expected ${API_STARTUP_FILE} inside the installer at ${expectedRoot}, ` +
       `but ${path.join(expectedRoot, API_STARTUP_FILE)} is missing. ` +
+      `Did the upstream archive layout change?`,
+  );
+}
+
+function findRootByApiStartup(stagingDir: string): string {
+  // BFS the staging tree for `api/BuildApiStartupFile.py`. The GMAT root is the
+  // parent of the `api` directory containing it. BFS over DFS so the shallowest
+  // match wins, matching the macOS DMG probe in `findApiStartupScript`.
+  const queue: string[] = [stagingDir];
+  while (queue.length > 0) {
+    const dir = queue.shift() as string;
+    let entries;
+    try {
+      entries = readdirSync(dir, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+    for (const entry of entries) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        queue.push(full);
+      } else if (
+        entry.isFile() &&
+        entry.name === 'BuildApiStartupFile.py' &&
+        path.basename(dir) === 'api'
+      ) {
+        return path.dirname(dir);
+      }
+    }
+  }
+  throw new Error(
+    `Could not locate ${API_STARTUP_FILE} anywhere under ${stagingDir}. ` +
       `Did the upstream archive layout change?`,
   );
 }
