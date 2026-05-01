@@ -51,10 +51,11 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         version: [R2022a, R2025a, R2026a]
-        # macos-latest is Apple Silicon; R2022a's gmatpy ships x86_64-only .so
-        # files (predates Apple Silicon support). Replace that cell with
-        # macos-13 (last x86_64 macOS runner) via exclude+include below.
-        # R2025a/R2026a ship arm64-compatible builds and stay on macos-latest.
+        # R2022a's macOS DMG is x86_64-only (predates Apple Silicon support
+        # entirely), and macos-latest is now arm64. The only free x86_64 macOS
+        # runner left is macos-13, which is being deprecated and has very long
+        # queue times. Skip the cell — the combo is genuinely unsupported by
+        # NASA's upstream artifact on modern macOS hardware.
         exclude:
           - os: macos-latest
             version: R2022a
@@ -68,9 +69,6 @@ jobs:
             python-version: '3.12'
           - version: R2026a
             python-version: '3.12'
-          - os: macos-13
-            version: R2022a
-            python-version: '3.9'
     steps:
       - uses: actions/checkout@v5
 
