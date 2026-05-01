@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+import { createReadStream } from 'node:fs';
 import { stat } from 'node:fs/promises';
 import * as core from '@actions/core';
 import * as tc from '@actions/tool-cache';
@@ -34,13 +36,29 @@ const MACOS_MIN_SIZE_BYTES: Record<GmatVersion, number> = {
   R2026a: 400 * MIB,
 };
 
-export async function download(version: GmatVersion): Promise<string> {
+export interface DownloadResult {
+  archivePath: string;
+  sha256: string;
+}
+
+export async function download(version: GmatVersion): Promise<DownloadResult> {
   const spec = installerSpec(detectRunnerOs(), version);
   core.info(`Downloading GMAT ${version} ${spec.archiveLabel} from ${spec.url}`);
   const archivePath = await tc.downloadTool(spec.url);
   core.info(`Downloaded to ${archivePath}`);
   await assertMinSize(archivePath, spec, version);
-  return archivePath;
+  const sha256 = await hashFile(archivePath);
+  core.info(`Installer SHA-256: ${sha256}`);
+  return { archivePath, sha256 };
+}
+
+async function hashFile(filePath: string): Promise<string> {
+  const hash = createHash('sha256');
+  const stream = createReadStream(filePath);
+  for await (const chunk of stream) {
+    hash.update(chunk);
+  }
+  return hash.digest('hex');
 }
 
 function installerSpec(runnerOs: RunnerOs, version: GmatVersion): InstallerSpec {
