@@ -1,0 +1,57 @@
+name: Drift
+
+# Daily HTTP HEAD probe of every SourceForge installer URL the action's
+# URL builder (src/download.ts) can construct for a supported (OS x version)
+# combination. Fast-fails on URL drift so it is caught before the weekly
+# full-matrix self-CI cron (ci.yml) or downstream consumers notice.
+#
+# macOS x R2022a is excluded — the upstream DMG is x86_64-only and modern
+# macos-latest runners are arm64, so the action does not support that cell
+# (matches ci.yml's exclusion).
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  url-liveness:
+    name: URL liveness
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Probe SourceForge installer URLs
+        shell: bash
+        # URL templates mirror src/download.ts:72-92. Keep in sync if the
+        # builder changes.
+        run: |
+          set -uo pipefail
+
+          urls=(
+            "https://sourceforge.net/projects/gmat/files/GMAT/GMAT-R2022a/gmat-ubuntu-x64-R2022a.tar.gz/download"
+            "https://sourceforge.net/projects/gmat/files/GMAT/GMAT-R2025a/gmat-ubuntu-x64-R2025a.tar.gz/download"
+            "https://sourceforge.net/projects/gmat/files/GMAT/GMAT-R2026a/gmat-ubuntu-x64-R2026a.tar.gz/download"
+            "https://sourceforge.net/projects/gmat/files/GMAT/GMAT-R2022a/gmat-win-R2022a.zip/download"
+            "https://sourceforge.net/projects/gmat/files/GMAT/GMAT-R2025a/gmat-win-R2025a.zip/download"
+            "https://sourceforge.net/projects/gmat/files/GMAT/GMAT-R2026a/gmat-win-R2026a.zip/download"
+            "https://sourceforge.net/projects/gmat/files/GMAT/GMAT-R2025a/gmat-mac-R2025a-signed.dmg/download"
+            "https://sourceforge.net/projects/gmat/files/GMAT/GMAT-R2026a/gmat-mac-x64-R2026a-signed.dmg/download"
+          )
+
+          fail=0
+          printf '%-7s %s\n' 'STATUS' 'URL'
+          for url in "${urls[@]}"; do
+            status=$(curl -ILso /dev/null --max-time 30 -w '%{http_code}' "$url" || echo 'ERR')
+            printf '%-7s %s\n' "$status" "$url"
+            if [[ "$status" != 2* ]]; then
+              fail=1
+            fi
+          done
+
+          if (( fail )); then
+            echo "::error::One or more SourceForge installer URLs are unreachable; investigate before downstream consumers hit it"
+            exit 1
+          fi
