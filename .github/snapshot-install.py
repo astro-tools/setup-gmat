@@ -60,7 +60,10 @@ def snapshot(root: Path, out: Path) -> None:
             continue
         entries.append(f"{hash_file(path)}  {rel.as_posix()}")
     entries.sort()
-    out.write_text("\n".join(entries) + "\n", newline="\n")
+    # write_bytes (not write_text with newline=) so the script runs on
+    # Python 3.9 — write_text gained `newline` only in 3.10, and the matrix
+    # pins R2022a cells to 3.9 for gmatpy ABI reasons.
+    out.write_bytes(("\n".join(entries) + "\n").encode("utf-8"))
     print(f"snapshot: wrote {len(entries)} entries to {out}")
 
 
