@@ -78,7 +78,28 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      # Python 3.9 reached EOL 2025-10 and is no longer in the windows-latest
+      # tool cache, so actions/setup-python's manifest install adds ~55s per
+      # R2022a run. uv pulls 3.9 from python-build-standalone in seconds.
+      # setup-uv only sets UV_PYTHON; the install + PATH step below makes
+      # `python` resolve to it for the action's BuildApiStartupFile call.
+      - if: matrix.version == 'R2022a'
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - if: matrix.version == 'R2022a'
+        name: Put uv-installed Python on PATH
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv python install
+          python_bin="$(uv python find)"
+          echo "Resolved Python: ${python_bin}"
+          dirname "${python_bin}" >> "$GITHUB_PATH"
+
+      - if: matrix.version != 'R2022a'
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
