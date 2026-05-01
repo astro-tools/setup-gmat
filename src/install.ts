@@ -32,15 +32,15 @@ async function resolveInstall(inputs: Inputs): Promise<{ gmatRoot: string; cache
     }
   }
 
-  const archive = await core.group(`Download GMAT ${inputs.version}`, () =>
+  const { archivePath, sha256 } = await core.group(`Download GMAT ${inputs.version}`, () =>
     download(inputs.version),
   );
   const gmatRoot = await core.group('Extract GMAT installer', () =>
-    extract(archive, inputs.version),
+    extract(archivePath, inputs.version),
   );
 
   if (inputs.cache) {
-    await core.group('Save GMAT cache', () => saveCache(inputs.version, gmatRoot));
+    await core.group('Save GMAT cache', () => saveCache(inputs.version, sha256, gmatRoot));
   }
 
   return { gmatRoot, cacheHit: false };
