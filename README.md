@@ -52,7 +52,7 @@ If you run `setup-gmat` against a Python version outside the matching column, `B
 
 ## Quick start
 
-A complete workflow that installs GMAT, runs `gmatpy`, and is shaped as a matrix so it scales to multiple versions cleanly:
+A complete workflow that installs GMAT, runs `gmatpy`, and is shaped as a matrix across the three supported runner OSes:
 
 ```yaml
 name: gmat-ci
@@ -61,11 +61,11 @@ on: [push, pull_request]
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        gmat-version: [R2026a]
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
       - uses: actions/checkout@v5
 
@@ -76,7 +76,7 @@ jobs:
       - id: gmat
         uses: astro-tools/setup-gmat@v0
         with:
-          version: ${{ matrix.gmat-version }}
+          version: R2026a
           cache: true
 
       - name: Show install metadata
@@ -86,6 +86,8 @@ jobs:
           echo "cache-hit=${{ steps.gmat.outputs.cache-hit }}"
 ```
 
+For a workflow that also varies the GMAT version across the matrix, see the [multi-version compatibility recipe](https://astro-tools.github.io/setup-gmat/recipes/multi-version/).
+
 ## Documentation
 
 Full documentation lives at **<https://astro-tools.github.io/setup-gmat/>** — getting started, inputs and outputs, recipes, FAQ, and troubleshooting.
@@ -94,8 +96,7 @@ Full documentation lives at **<https://astro-tools.github.io/setup-gmat/>** — 
 
 | Release          | Scope                                                                        |
 | ---------------- | ---------------------------------------------------------------------------- |
-| v0.1 _(current)_ | Linux + R2026a, basic caching, smoke check.                                  |
-| v0.2             | Linux + Windows + macOS, R2022a/R2025a/R2026a; weekly self-CI cron next.     |
+| v0.2 _(current)_ | Linux + Windows + macOS, R2022a/R2025a/R2026a, caching, smoke check.         |
 | v0.3             | Docker image on GHCR, semantic-release wired up, cosign image signing.       |
 | v1.0             | Public API stability; at least two external consumers shipped on the action. |
 
