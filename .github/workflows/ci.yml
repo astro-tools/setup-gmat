@@ -42,10 +42,15 @@ jobs:
           fi
 
   self-test:
-    name: self-test
+    name: self-test (${{ matrix.os }} / ${{ matrix.version }})
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        version: [R2022a, R2025a, R2026a]
     steps:
       - uses: actions/checkout@v5
 
@@ -57,47 +62,40 @@ jobs:
         id: install-1
         uses: ./
         with:
-          version: R2026a
+          version: ${{ matrix.version }}
           cache: true
 
       - name: Snapshot install after run 1
-        run: |
-          find "$GMAT_ROOT" -type f \
-            ! -name 'api_startup_file.txt' \
-            ! -path '*/__pycache__/*' \
-            ! -name '*.pyc' \
-            -print0 | sort -z | xargs -0 sha256sum > /tmp/manifest-1.txt
-          wc -l /tmp/manifest-1.txt
+        run: python .github/snapshot-install.py snapshot "${{ env.GMAT_ROOT }}" "${{ runner.temp }}/manifest-1.txt"
 
       - name: Reset install path
-        run: rm -rf "$GMAT_ROOT"
+        run: python .github/snapshot-install.py reset "${{ env.GMAT_ROOT }}"
 
       - name: Install GMAT (run 2)
         id: install-2
+        timeout-minutes: 1
         uses: ./
         with:
-          version: R2026a
+          version: ${{ matrix.version }}
           cache: true
 
       - name: Assert cache-hit on run 2
+        shell: bash
         run: |
+          set -euo pipefail
           if [ "${{ steps.install-2.outputs.cache-hit }}" != "true" ]; then
             echo "::error::Expected cache-hit=true on run 2, got '${{ steps.install-2.outputs.cache-hit }}'"
             exit 1
           fi
 
       - name: Snapshot install after run 2
-        run: |
-          find "$GMAT_ROOT" -type f \
-            ! -name 'api_startup_file.txt' \
-            ! -path '*/__pycache__/*' \
-            ! -name '*.pyc' \
-            -print0 | sort -z | xargs -0 sha256sum > /tmp/manifest-2.txt
-          wc -l /tmp/manifest-2.txt
+        run: python .github/snapshot-install.py snapshot "${{ env.GMAT_ROOT }}" "${{ runner.temp }}/manifest-2.txt"
 
       - name: Cache equivalence
+        shell: bash
         run: |
-          if ! diff -u /tmp/manifest-1.txt /tmp/manifest-2.txt; then
+          set -euo pipefail
+          if ! diff -u "${RUNNER_TEMP}/manifest-1.txt" "${RUNNER_TEMP}/manifest-2.txt"; then
             echo "::error::Cache restore differs from cache-saved state"
             exit 1
           fi
