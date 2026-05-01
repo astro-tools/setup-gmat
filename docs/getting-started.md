@@ -4,8 +4,8 @@ This page walks through the minimum CI workflow that installs GMAT and runs your
 
 ## Prerequisites
 
-- A Linux, Windows, or macOS runner. `ubuntu-latest` is the only configuration currently exercised in setup-gmat's CI. Other Linux runners with a recent glibc should work but are not covered by CI; cross-platform self-CI for `windows-latest` and `macos-latest` is tracked under a future milestone.
-- `python` on `PATH` _before_ `setup-gmat` runs. The action shells out to `BuildApiStartupFile.py` and runs an internal smoke check; both invoke whatever Python `which python` resolves. The action does **not** bundle its own interpreter. Use [`actions/setup-python`](https://github.com/actions/setup-python) (or any equivalent) to put one on PATH.
+- A Linux, Windows, or macOS runner. Every supported `(runner, version)` pair except `macos-latest × R2022a` is exercised on every PR — R2022a's macOS DMG is x86_64-only and Apple Silicon runners cannot load it. Other Linux runners with a recent glibc should work but are not exercised in CI.
+- `python` on `PATH` _before_ `setup-gmat` runs. The action shells out to `BuildApiStartupFile.py` and runs an internal smoke check; both invoke whatever Python `which python` resolves. The action does **not** bundle its own interpreter. Use [`actions/setup-python`](https://github.com/actions/setup-python) (or any equivalent) to put one on PATH. Pin Python to a version your chosen GMAT release ships `gmatpy` bindings for — see the [Python ABI per GMAT release](https://github.com/astro-tools/setup-gmat#python-abi-per-gmat-release) table in the README.
 
 ## Minimum workflow
 

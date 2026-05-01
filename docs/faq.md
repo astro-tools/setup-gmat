@@ -10,7 +10,7 @@ If `python` isn't on `PATH`, the action fails with:
 python is not on PATH (...). Add a 'uses: actions/setup-python@v5' step before setup-gmat.
 ```
 
-Any mechanism that puts a `python` binary on `PATH` works — `actions/setup-python` is the standard one. GMAT R2026a's pre-built `gmatpy` modules support Python 3.9 through 3.14.
+Any mechanism that puts a `python` binary on `PATH` works — `actions/setup-python` is the standard one. The Python version you pin must match a `gmatpy` binding shipped by the GMAT release you're installing — R2022a covers 3.6–3.9 (Linux extends to 3.10), R2025a covers 3.9–3.12, R2026a covers 3.9–3.14. See the [Python ABI table](https://github.com/astro-tools/setup-gmat#python-abi-per-gmat-release) in the README for the cross-OS view.
 
 ## When does the GMAT cache get invalidated?
 
@@ -24,9 +24,9 @@ The key is **not** sensitive to the action's minor or patch version, the upstrea
 
 ## Which GMAT versions are supported?
 
-The action installs **R2022a, R2025a, or R2026a** on Linux, Windows, and macOS runners. Any other value for `version` raises a validation error at parse time, before any download.
+The action installs **R2022a, R2025a, or R2026a** on Linux, Windows, and macOS runners — with one exception: R2022a is not supported on `macos-latest`. R2022a's macOS DMG ships x86_64-only `gmatpy` `.so` files (predates Apple Silicon entirely) and Apple Silicon Python cannot dlopen them. R2025a and R2026a ship arm64-compatible bindings and run natively on Apple Silicon. See the [supported-versions matrix](https://github.com/astro-tools/setup-gmat#supported-versions) in the README for the full table.
 
-NASA never released R2023a or R2024a — there are no SourceForge artifacts for those versions, and they will not appear in any version matrix this action ships.
+Any other value for `version` raises a validation error at parse time, before any download. NASA never released R2023a or R2024a — there are no SourceForge artifacts for those versions, and they will not appear in any version matrix this action ships.
 
 ## Why does `python -c "import gmatpy"` fail in a step after `setup-gmat`?
 
