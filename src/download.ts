@@ -36,6 +36,14 @@ const MACOS_MIN_SIZE_BYTES: Record<GmatVersion, number> = {
   R2026a: 400 * MIB,
 };
 
+// SourceForge filenames vary per release: R2022a is unsigned and arch-implicit,
+// R2025a is signed but arch-implicit, R2026a is the modern `-x64-…-signed` form.
+const MACOS_INSTALLER_FILENAME: Record<GmatVersion, string> = {
+  R2022a: 'gmat-mac-R2022a.dmg',
+  R2025a: 'gmat-mac-R2025a-signed.dmg',
+  R2026a: 'gmat-mac-x64-R2026a-signed.dmg',
+};
+
 export interface DownloadResult {
   archivePath: string;
   sha256: string;
@@ -77,7 +85,7 @@ function installerSpec(runnerOs: RunnerOs, version: GmatVersion): InstallerSpec 
       };
     case 'macos':
       return {
-        url: `https://sourceforge.net/projects/gmat/files/GMAT/GMAT-${version}/gmat-mac-x64-${version}-signed.dmg/download`,
+        url: `https://sourceforge.net/projects/gmat/files/GMAT/GMAT-${version}/${MACOS_INSTALLER_FILENAME[version]}/download`,
         minBytes: MACOS_MIN_SIZE_BYTES[version],
         archiveLabel: 'macOS installer',
       };
