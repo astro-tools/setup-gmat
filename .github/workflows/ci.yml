@@ -51,11 +51,12 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         version: [R2022a, R2025a, R2026a]
-        # R2022a's gmatpy ships _py36..._py310 only; pin Python 3.10 so the
-        # smoke check has a matching binding. R2025a/R2026a both ship _py312.
+        # R2022a's Windows/macOS gmatpy builds ship _py36..._py39 only (Linux
+        # adds _py310, but lowest-common-denominator wins). R2025a/R2026a both
+        # ship _py312 across every platform.
         include:
           - version: R2022a
-            python-version: '3.10'
+            python-version: '3.9'
           - version: R2025a
             python-version: '3.12'
           - version: R2026a
