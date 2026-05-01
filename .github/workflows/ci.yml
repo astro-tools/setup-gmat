@@ -4,6 +4,12 @@ on:
   pull_request:
   push:
     branches: [main]
+  # Weekly re-run of the self-test matrix to catch SourceForge URL drift,
+  # mirror retirements, and installer-archive layout changes before
+  # downstream consumers do. Mondays 06:00 UTC (low-traffic window).
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
