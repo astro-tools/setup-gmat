@@ -14,7 +14,7 @@ GitHub Action for installing [NASA GMAT](https://gmat.gsfc.nasa.gov/) (General M
 
 ## Status
 
-setup-gmat installs GMAT (R2022a, R2025a, or R2026a) on Linux, Windows, and macOS runners, caches the install across runs, and exports `GMAT_ROOT` to the workflow environment.
+setup-gmat installs GMAT (R2022a, R2025a, or R2026a) on Linux, Windows, and macOS runners, caches the install across runs, and exports `GMAT_ROOT` to the workflow environment. Every supported `(runner, version)` pair except `macos-latest × R2022a` is exercised in self-CI on every PR — see [Supported versions](#supported-versions) for the matrix and the macOS R2022a caveat.
 
 ## What it does
 
@@ -28,13 +28,27 @@ setup-gmat installs GMAT (R2022a, R2025a, or R2026a) on Linux, Windows, and macO
 
 ## Supported versions
 
-| Runner           | GMAT versions          |
-| ---------------- | ---------------------- |
-| `ubuntu-latest`  | R2022a, R2025a, R2026a |
-| `windows-latest` | R2022a, R2025a, R2026a |
-| `macos-latest`   | R2022a, R2025a, R2026a |
+| Runner           | R2022a               | R2025a | R2026a |
+| ---------------- | -------------------- | ------ | ------ |
+| `ubuntu-latest`  | ✅                   | ✅     | ✅     |
+| `windows-latest` | ✅                   | ✅     | ✅     |
+| `macos-latest`   | ❌ (x86_64-only DMG) | ✅     | ✅     |
 
-The action pulls GMAT's generic Linux x86_64 build on Linux runners (other Linux runners with a recent glibc should work), the Windows x86_64 build on Windows runners, and the signed x86_64 macOS DMG on macOS runners (Apple Silicon runners install the same x86_64 build and run it under Rosetta). `ubuntu-latest` is the only configuration currently exercised in CI; cross-platform self-CI across all supported runner OSes is tracked under a future milestone.
+Every cell in the table above is exercised on every PR and on `main` — see the `self-test` job in `.github/workflows/ci.yml`.
+
+R2022a's macOS DMG ships x86_64-only `gmatpy` `.so` files and predates Apple Silicon support; `macos-latest` is now arm64, so the import fails with "incompatible architecture" at runtime. R2025a and R2026a ship arm64-compatible bindings and run natively on Apple Silicon. Linux uses GMAT's generic x86_64 build (other Linux runners with a recent glibc should work but are not exercised); Windows uses the x86_64 zip.
+
+### Python ABI per GMAT release
+
+The smoke check imports `gmatpy`, which is a per-Python-version compiled binding shipped inside the GMAT release. Pin Python to a version the release shipped:
+
+| GMAT version | gmatpy bindings shipped (cross-OS minimum) |
+| ------------ | ------------------------------------------ |
+| R2022a       | 3.6, 3.7, 3.8, 3.9 (Linux also adds 3.10)  |
+| R2025a       | 3.9 – 3.12                                 |
+| R2026a       | 3.9 – 3.14                                 |
+
+If you run `setup-gmat` against a Python version outside the matching column, `BuildApiStartupFile.py` or the smoke check fails with `ModuleNotFoundError: No module named '_pyXYZ'`. For a matrix that includes R2022a, pin Python 3.9 — that's the lowest common denominator across every supported OS.
 
 ## Quick start
 

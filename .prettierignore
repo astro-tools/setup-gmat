@@ -3,3 +3,4 @@ node_modules/
 site/
 coverage/
 package-lock.json
+.github/*.py

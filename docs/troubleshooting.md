@@ -46,7 +46,7 @@ Without api/api_startup_file.txt, gmatpy import will fail at runtime.
 
 `BuildApiStartupFile.py` writes `bin/api_startup_file.txt`, which `gmat.Setup()` reads on import. If it fails, the install is unusable even though the tarball extracted cleanly. Common causes:
 
-- **Mismatched Python ABI.** GMAT R2026a ships pre-built `gmatpy` modules for Python 3.9 through 3.14. Running `BuildApiStartupFile.py` under a Python outside that range will fail. Pin a supported version via `actions/setup-python`.
+- **Mismatched Python ABI.** Each GMAT release ships pre-built `gmatpy` bindings for a different Python range — R2022a covers 3.6–3.9 (Linux extends to 3.10), R2025a covers 3.9–3.12, R2026a covers 3.9–3.14. Running `BuildApiStartupFile.py` under a Python outside the matching range fails. Pin a supported version via `actions/setup-python`; see the [Python ABI table](https://github.com/astro-tools/setup-gmat#python-abi-per-gmat-release) in the README for the cross-OS view.
 - **Permissions on `$GMAT_ROOT/api/`.** The script writes inside the install tree; if the runner has restrictive umask or the path was made read-only by a previous step, the write fails. Default GitHub-hosted runners do not have this issue.
 - **Corrupted cache.** A previous run may have saved a partial install. Pass `cache: false` once to force a fresh download.
 
@@ -67,13 +67,32 @@ Read the stderr above the error for the underlying gmatpy / GMAT message. If you
 
 ## Archive layout drift
 
+On Linux and macOS the action expects a known wrapper path inside the archive:
+
 ```
-Expected GMAT/R2026a/api/BuildApiStartupFile.py inside the installer,
+Expected api/BuildApiStartupFile.py inside the installer at /tmp/.../GMAT/R2026a,
 but /tmp/.../GMAT/R2026a/api/BuildApiStartupFile.py is missing.
 Did the upstream archive layout change?
 ```
 
-`setup-gmat` resolves `GMAT_ROOT` by an exact path inside the tarball (`GMAT/<version>/`). If NASA changes the layout in a future release, this error fires immediately rather than producing a half-installed tree. The wrapper layout has been stable across the supported versions, so if you hit this against a supported `version`, the tarball is either corrupt locally or has been replaced upstream — open an issue.
+On Windows the layout varies across releases (R2026a is wrapper-less, older releases wrap in `GMAT/<version>/`), so the action probes for `api/BuildApiStartupFile.py` instead and reports:
+
+```
+Could not locate api/BuildApiStartupFile.py anywhere under D:\a\_temp\<staging>.
+Did the upstream archive layout change?
+```
+
+If you hit either error against a supported `version`, the archive is either corrupt locally or has been replaced upstream — open an issue.
+
+## macOS architecture mismatch (R2022a only)
+
+```
+ImportError: dlopen(.../bin/gmatpy/_py39/_gmat_py.so, ...):
+tried '...': mach-o file, but is an incompatible architecture
+(have 'x86_64', need 'arm64e' or 'arm64')
+```
+
+R2022a's macOS DMG ships x86_64-only `gmatpy` bindings — it predates Apple Silicon support entirely. `macos-latest` is now arm64, so any Python loaded from `actions/setup-python` is arm64 and cannot dlopen R2022a's `.so`. R2025a and R2026a ship arm64-compatible bindings and are unaffected. There is no in-action workaround; pick a different GMAT version on `macos-latest`, or move R2022a coverage to a non-macOS runner. See the [supported-versions matrix](https://github.com/astro-tools/setup-gmat#supported-versions) in the README.
 
 ## Cache restore differs from a fresh install
 
