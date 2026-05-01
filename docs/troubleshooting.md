@@ -37,6 +37,8 @@ Add a 'uses: actions/setup-python@v5' step before setup-gmat.
 
 The `python-version` input on `setup-gmat` itself is informational and does **not** select the interpreter — see [Inputs and outputs](inputs-outputs.md#inputs).
 
+On **Windows self-hosted runners**, `which python` can resolve to the Windows Store launcher stub at `%LocalAppData%\Microsoft\WindowsApps\python.exe` even after `actions/setup-python` runs successfully — the stub is a launcher that opens the Microsoft Store rather than executing Python, so `BuildApiStartupFile.py` either fails to start or falls through to the same "not on PATH" error from a downstream step. GitHub-hosted Windows runners do not hit this. On self-hosted runners, disable the App Execution Aliases for `python.exe` and `python3.exe` (Settings → Apps → Advanced app settings → App execution aliases), or move `setup-python`'s install directory ahead of `%LocalAppData%\Microsoft\WindowsApps` in the runner's system PATH. The other Windows-specific way to hit this error despite a green `setup-python` step is asking for a `python-version` that doesn't publish a Windows build — `setup-python` installs nothing and reports success, and the action then fails at the first `python` lookup.
+
 ## `BuildApiStartupFile.py` failed
 
 ```
@@ -83,6 +85,54 @@ Did the upstream archive layout change?
 ```
 
 If you hit either error against a supported `version`, the archive is either corrupt locally or has been replaced upstream — open an issue.
+
+## `hdiutil attach` failed (macOS)
+
+```
+hdiutil: attach failed - <reason>
+```
+
+The action mounts the GMAT DMG via `hdiutil attach -nobrowse -readonly -noautoopen` with empty stdin (to defend against an interactive license prompt blocking the runner). When `hdiutil` itself exits non-zero, its stderr bubbles up unwrapped — there is no `setup-gmat`-formatted error around it. Common causes:
+
+- **Truncated DMG** — `hdiutil: attach failed - no mountable file systems`. The download size check usually catches truncation earlier; if you reach `attach` with this error, the archive is corrupt past the prefix the size check inspects. Re-run the workflow; if it persists, open an issue.
+- **Mountpoint busy** — `hdiutil: attach failed - Resource busy`. A prior run on the same self-hosted runner left a mount under `$RUNNER_TEMP/gmat-dmg-mount-<uuid>`. The mountpoint is per-run UUID, so collisions only happen if a runner was killed mid-mount and reused the same `RUNNER_TEMP`. Manually `hdiutil detach -force <mountpoint>` and remove the directory.
+- **Permission denied** — the runner user can't access disk-arbitration or the temp directory. GitHub-hosted runners do not hit this; self-hosted macOS runners may need to relax sandboxing or run under an account that can mount disk images.
+
+## Stale DMG mountpoint after a killed runner (macOS)
+
+```
+hdiutil detach failed for /var/folders/.../gmat-dmg-mount-<uuid>: <reason>.
+Self-hosted runners may need manual cleanup.
+```
+
+This is a `warning`, not a hard failure — the install completed and the action proceeds. The detach in the action's `finally` block did not succeed, usually because the OS held a lock on the mount immediately after the copy (Spotlight indexing the freshly-visible files; antivirus scanning; an open Finder window despite `-nobrowse`). On GitHub-hosted runners the session ends and the mount is reclaimed automatically; on long-lived self-hosted runners the mountpoints can accumulate.
+
+To clean up manually:
+
+```bash
+hdiutil detach -force /var/folders/.../gmat-dmg-mount-<uuid>
+rm -rf /var/folders/.../gmat-dmg-mount-<uuid>
+```
+
+If this warning appears regularly on a self-hosted macOS runner, exclude `$RUNNER_TEMP` from Spotlight (`sudo mdutil -i off "$RUNNER_TEMP"`) — the indexer is the most common holder of mount locks immediately after the copy completes.
+
+## ZIP extraction fails on Windows
+
+The Windows install path uses `tc.extractZip` from `@actions/tool-cache`, which delegates to 7-Zip / `Expand-Archive` under the hood. Failures bubble up unwrapped — you see the underlying extractor's stderr in the workflow log, not a `setup-gmat`-formatted error. By far the most common cause on **self-hosted** Windows runners is path-length: the staged install path
+
+```
+%RUNNER_TEMP%\<random>\GMAT\R2025a\bin\gmatpy\_py312\<long file>
+```
+
+can exceed Windows' default `MAX_PATH` of 260 characters. GitHub-hosted Windows runners ship with long-path support enabled (`LongPathsEnabled=1` in the registry), so this primarily affects custom or self-hosted Windows runners.
+
+Fixes, in order of preference:
+
+- Enable long paths on the runner: set `HKLM\SYSTEM\CurrentControlSet\Control\FileSystem\LongPathsEnabled = 1` in the registry, restart the runner service. If your workflow uses `git` on the same paths, also `git config --system core.longpaths true`.
+- Move `RUNNER_TEMP` to a shorter root (e.g. `C:\R\T`) to leave more headroom under the limit.
+- Switch the affected matrix cells to `windows-latest` (GitHub-hosted) where long paths are already enabled.
+
+If the error is something other than a path-length failure (corrupt zip, unexpected layout), see [Archive layout drift](#archive-layout-drift) — the Windows-side `findRootByApiStartup` probe surfaces layout problems with a `setup-gmat`-formatted error string.
 
 ## macOS architecture mismatch (R2022a only)
 
