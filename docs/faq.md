@@ -68,4 +68,4 @@ For local use, install GMAT directly from [SourceForge](https://sourceforge.net/
 
 ## Does setup-gmat verify the download?
 
-It checks the archive size against a hardcoded per-version minimum (e.g. ≈380 MiB for R2026a) before extraction, which catches truncated downloads and SourceForge HTML-mirror responses. It does **not** verify a checksum or signature in v0.1 — supply-chain hardening (cosign-signed Docker image, attested provenance) is on the v0.3 roadmap.
+It checks the archive size against a hardcoded per-version minimum (e.g. ≈380 MiB for R2026a) before extraction, which catches truncated downloads and SourceForge HTML-mirror responses. It does **not** verify a checksum or signature — supply-chain hardening (cosign-signed Docker image, attested provenance) is on the v0.3 roadmap.
