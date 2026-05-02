@@ -126,29 +126,39 @@ jobs:
             INSTALLER_SHA256=${{ steps.sha.outputs.value }}
             ACTION_VERSION=${{ github.ref_name }}
 
-      # Run the smoke script under each pinned Python (3.10 / 3.11 / 3.12)
-      # inside the locally-tagged image. Any failure propagates verbatim into
-      # the workflow log (no piping/grep) and aborts the cell via `set -e`,
-      # which prevents the push step below from running. Sample is the
-      # smallest .script in samples/ that exercises the propagator
-      # (Ex_HighFidelitySRP.script, 1269 B in R2026a) — see #62.
-      - name: Smoke (gmatpy import + stock-sample propagation per Python)
+      # Run the smoke script under every Python the image supports for gmatpy
+      # — i.e. the intersection of (pyenv-installed interpreters) and
+      # (gmatpy/_pyXY directories shipped with this GMAT version). Per-version
+      # coverage varies: R2022a's Linux gmatpy ships only _py36..._py310 (per
+      # ci.yml self-test matrix), R2025a/R2026a ship _py312 universally and
+      # R2026a Linux additionally ships _py310/_py311. Detecting the
+      # intersection inside the container avoids hard-coding the matrix here
+      # and stays correct as future GMAT versions add or drop interpreters.
+      # Any failure propagates verbatim (no piping/grep) and aborts the cell
+      # via `set -e`, blocking the push step below. An empty intersection is
+      # itself a release-blocker — it means none of the installed Pythons can
+      # actually `import gmatpy` for this GMAT version. Sample is the smallest
+      # .script in samples/ that exercises the propagator: R2026a renamed it
+      # from Ex_R2014a_HighFidelitySRP.script to Ex_HighFidelitySRP.script,
+      # mirroring the SMOKE_SAMPLES map in src/smoke.ts. See #62.
+      - name: Smoke (gmatpy import + stock-sample propagation per supported Python)
         shell: bash
         env:
           # Wall-clock RunScript() duration is the elapsed-time metric: GMAT
-          # Spacecraft objects retain script-time config after RunScript
-          # (the propagated state lives in the runtime sandbox and isn't
-          # readable via GetObject), so probing sat.GetField('A1ModJulian')
-          # or 'X' would still return the initial values. Wall-clock is the
-          # robust signal: combined with LoadScript()/RunScript() returning
-          # True it proves gmatpy executed the propagator end-to-end.
+          # Spacecraft objects retain script-time config after RunScript (the
+          # propagated state lives in the runtime sandbox and isn't readable
+          # via GetObject), so probing sat.GetField('A1ModJulian') or 'X'
+          # would still return the initial values. Wall-clock is the robust
+          # signal: combined with LoadScript()/RunScript() returning True it
+          # proves gmatpy executed the propagator end-to-end.
           SMOKE_PY: |
             import sys, os, time
             import gmatpy as gmat
             gmat.Setup('/opt/gmat/bin/api_startup_file.txt')
             os.chdir('/opt/gmat/samples')
-            if not gmat.LoadScript('Ex_HighFidelitySRP.script'):
-                sys.exit('LoadScript failed')
+            sample = os.environ['SMOKE_SAMPLE']
+            if not gmat.LoadScript(sample):
+                sys.exit(f'LoadScript failed for {sample}')
             t0 = time.perf_counter()
             if not gmat.RunScript():
                 sys.exit('RunScript failed')
@@ -157,14 +167,36 @@ jobs:
                 sys.exit(f'No elapsed time: {elapsed}')
             print(
                 f'OK py{sys.version_info.major}.{sys.version_info.minor}: '
-                f'gmatpy import + RunScript in {elapsed:.4f}s'
+                f'gmatpy + {sample} in {elapsed:.4f}s'
             )
         run: |
           set -euo pipefail
           image="gmat-smoke:${{ matrix.version }}"
-          for py in 3.10 3.11 3.12; do
-            echo "::group::Smoke (Python ${py})"
-            docker run --rm "$image" "python${py}" -c "$SMOKE_PY"
+
+          case "${{ matrix.version }}" in
+            R2026a) sample="Ex_HighFidelitySRP.script" ;;
+            *)      sample="Ex_R2014a_HighFidelitySRP.script" ;;
+          esac
+
+          installed_pys=$(docker run --rm "$image" pyenv versions --bare \
+            | awk -F. 'NF>=2 {print $1"."$2}' | sort -u)
+          gmatpy_pys=$(docker run --rm "$image" sh -c 'ls -1 /opt/gmat/bin/gmatpy/' \
+            | awk '/^_py[0-9]+$/ {v=substr($0,4); print substr(v,1,1)"."substr(v,2)}' | sort -u)
+          to_smoke=$(comm -12 <(echo "$installed_pys") <(echo "$gmatpy_pys"))
+
+          if [ -z "$to_smoke" ]; then
+            echo "::error::No Python interpreter is both pyenv-installed AND supported by gmatpy in the ${{ matrix.version }} image"
+            echo "  pyenv installed: $(echo $installed_pys)"
+            echo "  gmatpy supports: $(echo $gmatpy_pys)"
+            exit 1
+          fi
+
+          echo "Smoking Python(s) for ${{ matrix.version }} (sample: ${sample}):" $(echo $to_smoke)
+          for py in $to_smoke; do
+            echo "::group::Smoke (Python ${py}, sample ${sample})"
+            docker run --rm \
+              -e SMOKE_SAMPLE="$sample" \
+              "$image" "python${py}" -c "$SMOKE_PY"
             echo "::endgroup::"
           done
 
