@@ -4,6 +4,21 @@ All notable changes to setup-gmat are documented here. The format follows [Keep 
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-05-02
+
+Canonical GMAT base image published on GHCR, with cosign keyless signing and a per-image gmatpy smoke gate before publish. Container-mode adoption is now a first-class recipe alongside the action.
+
+### Added
+
+- Multi-stage `Dockerfile` for the canonical GMAT base image: ubuntu:24.04 base, pyenv-managed Python 3.10/3.11/3.12, GMAT installed and `BuildApiStartupFile.py` resolved at build time, `GMAT_ROOT` and `PYTHONPATH` set so `import gmatpy` works in any of the three Pythons (#70, #72).
+- `PYTHON_VERSIONS` build arg on the Dockerfile so downstream image builds can narrow the bundled Python set without forking the Dockerfile (#74).
+- `docker.yml` GHCR publish workflow: builds the canonical image for every supported GMAT version on each `v*.*.*` tag, pushes per-version tags (`R2022a`, `R2025a`, `R2026a`) plus a `latest` alias floating to the newest supported release (#75).
+- Per-image smoke gate that runs `import gmatpy` and a one-line propagation against each bundled Python before push, failing the workflow before any tag is published if the import or run regresses (#76).
+- Cosign keyless signing for every pushed digest via GitHub OIDC, with the verification one-liner documented in the README (#77).
+- Container-mode docs recipe (`docs/recipes/docker.md`) and runnable `examples/docker-mode.yml`: how to run a job inside `ghcr.io/astro-tools/gmat:Rxxxxa` instead of installing the action on a fresh runner (#78).
+- Runnable workflow files in `examples/` mirroring the remaining recipe pages (`pytest.yml`, `run-mission-script.yml`, `skip-on-docs.yml`, `multi-version.yml`) so downstream repos can copy a complete `.github/workflows/*.yml` verbatim (#79).
+- Marketplace listing pass for v0.3: branding, description, and inputs/outputs metadata refreshed (#80).
+
 ## [0.2.0] - 2026-05-01
 
 Cross-platform coverage and full version matrix. setup-gmat now installs GMAT on Linux, Windows, and macOS runners against R2022a, R2025a, or R2026a — every cell of that matrix exercised in self-CI on every PR and on a weekly cron.
@@ -26,6 +41,8 @@ Cross-platform coverage and full version matrix. setup-gmat now installs GMAT on
 
 - v0.1's R2026a-hardcoded assumptions removed: cache key, smoke check, and version-resolution logic are now driven by the validated `version` input rather than embedded R2026a constants (audit folded into #47).
 - v0.1's Linux-hardcoded assumptions removed: `download` / `extract` / `GMAT_ROOT` resolution moved behind a per-OS dispatch instead of a single Linux tarball path (audit folded into #48).
+
+## [0.1.0] - 2026-04-30
 
 First usable release. Installs GMAT R2026a on Ubuntu runners and bootstraps gmatpy for use in CI.
 

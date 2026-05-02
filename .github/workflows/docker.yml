@@ -6,7 +6,7 @@ name: Publish image
 #
 # Tag pattern is 'v*.*.*' (not 'v*') so the floating major-version alias `v0`
 # does not trigger a redundant republish each time it is re-pointed; only the
-# SemVer tags cut by semantic-release (#64) drive a publish.
+# immutable SemVer tags pushed by the manual release-cut process drive a publish.
 
 on:
   push:

@@ -120,11 +120,10 @@ The signature is bound to the immutable manifest digest, so verifying a tag also
 
 ## Roadmap
 
-| Release          | Scope                                                                        |
-| ---------------- | ---------------------------------------------------------------------------- |
-| v0.2 _(current)_ | Linux + Windows + macOS, R2022a/R2025a/R2026a, caching, smoke check.         |
-| v0.3             | Docker image on GHCR, semantic-release wired up, cosign image signing.       |
-| v1.0             | Public API stability; at least two external consumers shipped on the action. |
+| Release          | Scope                                                                                            |
+| ---------------- | ------------------------------------------------------------------------------------------------ |
+| v0.3 _(current)_ | Canonical GMAT image on GHCR, cosign keyless signing, container-mode recipe + runnable examples. |
+| v1.0             | Public API stability; at least two external consumers shipped on the action.                     |
 
 ## License
 
