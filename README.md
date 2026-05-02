@@ -92,6 +92,18 @@ For a workflow that also varies the GMAT version across the matrix, see the [mul
 
 Full documentation lives at **<https://astro-tools.github.io/setup-gmat/>** — getting started, inputs and outputs, recipes, FAQ, and troubleshooting.
 
+## Verifying images
+
+Every image published to `ghcr.io/astro-tools/gmat` is signed with [cosign](https://github.com/sigstore/cosign) using GitHub OIDC keyless signing. To verify provenance before pulling:
+
+```
+cosign verify ghcr.io/astro-tools/gmat:R2026a \
+  --certificate-identity-regexp 'https://github\.com/astro-tools/setup-gmat/.*' \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+```
+
+The signature is bound to the immutable manifest digest, so verifying a tag also pins you to the exact bytes that were signed. Substitute any supported `Rxxxxa` tag (or `latest`) for `R2026a`.
+
 ## Roadmap
 
 | Release          | Scope                                                                        |
