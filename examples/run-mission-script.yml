@@ -1,0 +1,35 @@
+# Companion to docs/recipes/run-mission-script.md — installs GMAT, runs a
+# .script mission file via gmatpy.LoadScript / RunScript from a small Python
+# driver, then uploads the resulting report directory as a build artifact.
+#
+# Expects a `run_mission.py` driver in the consumer repo — see the recipe
+# page for the reference driver that loads $GMAT_ROOT/samples/Ex_HighFidelitySRP.script.
+
+name: run-mission
+
+on: [push, pull_request]
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: astro-tools/setup-gmat@v0
+        with:
+          version: R2026a
+
+      - name: Run mission script
+        run: python run_mission.py
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mission-reports
+          path: reports/
+          if-no-files-found: error

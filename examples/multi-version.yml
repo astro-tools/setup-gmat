@@ -1,0 +1,38 @@
+# Companion to docs/recipes/multi-version.md — exercises a consumer project
+# against {ubuntu, windows, macos} × {R2022a, R2025a, R2026a} minus the
+# unsupported macos × R2022a cell. fail-fast: false keeps every cell running
+# even when one fails, so a regression in one (os, version) pair doesn't
+# cancel signal from the others.
+
+name: gmat-compat
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        version: [R2022a, R2025a, R2026a]
+        exclude:
+          # macOS R2022a ships an x86_64-only DMG that Apple Silicon
+          # runners cannot dlopen — see Inputs and outputs.
+          - os: macos-latest
+            version: R2022a
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: astro-tools/setup-gmat@v0
+        with:
+          version: ${{ matrix.version }}
+
+      - name: Run tests
+        run: pytest tests/ -v
+        env:
+          PYTHONPATH: ${{ env.GMAT_ROOT }}/bin

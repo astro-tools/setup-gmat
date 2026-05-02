@@ -1,5 +1,7 @@
 # Skip the GMAT install on docs-only changes
 
+Runnable copy: [`examples/skip-on-docs.yml`](https://github.com/astro-tools/setup-gmat/blob/v0/examples/skip-on-docs.yml)
+
 Installing GMAT R2026a is a multi-hundred-megabyte download and a few minutes of CI time. Skipping the install on docs-only changes (READMEs, MkDocs pages, design notes) keeps PRs cheap when no code is touched.
 
 The fix is GitHub's built-in `paths-ignore` filter on the workflow trigger.

@@ -1,5 +1,7 @@
 # Run jobs in the GMAT container image
 
+Runnable copy: [`examples/docker-mode.yml`](https://github.com/astro-tools/setup-gmat/blob/v0/examples/docker-mode.yml)
+
 A workflow that runs its job inside `ghcr.io/astro-tools/gmat:R2026a` instead of installing GMAT on a fresh runner. The image ships GMAT pre-installed with `gmatpy` already importable, so the job skips the `setup-gmat` step entirely.
 
 Reach for this shape over the action when you want any of:

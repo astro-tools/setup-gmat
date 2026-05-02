@@ -1,5 +1,7 @@
 # Validate against every GMAT version on every OS
 
+Runnable copy: [`examples/multi-version.yml`](https://github.com/astro-tools/setup-gmat/blob/v0/examples/multi-version.yml)
+
 A workflow that exercises a consumer project against `{ubuntu-latest, windows-latest, macos-latest} × {R2022a, R2025a, R2026a}` — the full nine-combo matrix `setup-gmat` supports, minus one unsupported pair.
 
 The matrix surfaces version- and platform-specific breakage early: a fix that works on Linux R2026a but regresses on Windows R2022a fails one cell instead of slipping through.

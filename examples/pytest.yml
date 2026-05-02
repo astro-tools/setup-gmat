@@ -1,0 +1,29 @@
+# Companion to docs/recipes/pytest.md — installs GMAT, then runs a pytest
+# suite whose tests `import gmatpy`. The test step sets PYTHONPATH so gmatpy
+# resolves on import; the action does not modify PYTHONPATH by design.
+
+name: tests
+
+on: [push, pull_request]
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: astro-tools/setup-gmat@v0
+        with:
+          version: R2026a
+
+      - name: Install test dependencies
+        run: pip install pytest
+
+      - name: Run pytest
+        run: pytest tests/ -v
+        env:
+          PYTHONPATH: ${{ env.GMAT_ROOT }}/bin

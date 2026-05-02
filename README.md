@@ -92,6 +92,18 @@ For a workflow that also varies the GMAT version across the matrix, see the [mul
 
 Full documentation lives at **<https://astro-tools.github.io/setup-gmat/>** — getting started, inputs and outputs, recipes, FAQ, and troubleshooting.
 
+## Examples
+
+Runnable workflow files live in [`examples/`](examples/) — one per recipe, ready to drop into a downstream repo's `.github/workflows/` verbatim:
+
+- [`examples/pytest.yml`](examples/pytest.yml) — run a `pytest` suite that imports `gmatpy`.
+- [`examples/run-mission-script.yml`](examples/run-mission-script.yml) — drive a `.script` mission file from Python and upload the report.
+- [`examples/skip-on-docs.yml`](examples/skip-on-docs.yml) — `paths-ignore` so docs-only PRs skip the heavy install.
+- [`examples/multi-version.yml`](examples/multi-version.yml) — `{ubuntu, windows, macos} × {R2022a, R2025a, R2026a}` matrix.
+- [`examples/docker-mode.yml`](examples/docker-mode.yml) — run the job inside `ghcr.io/astro-tools/gmat:Rxxxxa` instead of using the action.
+
+Each one mirrors the corresponding [recipe page](https://astro-tools.github.io/setup-gmat/recipes/) in the docs.
+
 ## Verifying images
 
 Every image published to `ghcr.io/astro-tools/gmat` is signed with [cosign](https://github.com/sigstore/cosign) using GitHub OIDC keyless signing. To verify provenance before pulling:
