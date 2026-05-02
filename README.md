@@ -122,7 +122,6 @@ The signature is bound to the immutable manifest digest, so verifying a tag also
 
 | Release          | Scope                                                                                            |
 | ---------------- | ------------------------------------------------------------------------------------------------ |
-| v0.2             | Linux + Windows + macOS, R2022a/R2025a/R2026a, caching, smoke check.                             |
 | v0.3 _(current)_ | Canonical GMAT image on GHCR, cosign keyless signing, container-mode recipe + runnable examples. |
 | v1.0             | Public API stability; at least two external consumers shipped on the action.                     |
 
