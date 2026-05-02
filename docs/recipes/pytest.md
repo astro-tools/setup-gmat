@@ -1,5 +1,7 @@
 # Run pytest against gmatpy
 
+Runnable copy: [`examples/pytest.yml`](https://github.com/astro-tools/setup-gmat/blob/v0/examples/pytest.yml)
+
 A workflow that installs GMAT, then runs a `pytest` suite whose tests `import gmatpy`. The test step sets `PYTHONPATH=$GMAT_ROOT/bin` so `gmatpy` resolves on import — see [Getting started → Calling gmatpy from your own steps](../getting-started.md#calling-gmatpy-from-your-own-steps) for why this is necessary.
 
 ## Workflow

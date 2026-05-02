@@ -1,0 +1,30 @@
+# Companion to docs/recipes/skip-on-docs.md — uses paths-ignore on the
+# trigger so PRs that only touch READMEs or docs/ skip the multi-hundred-MB
+# GMAT install entirely. See the recipe for the inverse `paths` filter that
+# scopes a separate docs build to the same files.
+
+name: gmat-ci
+
+on:
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: astro-tools/setup-gmat@v0
+        with:
+          version: R2026a
+      # ... your test / propagation steps

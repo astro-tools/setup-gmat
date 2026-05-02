@@ -1,5 +1,7 @@
 # Run a mission script and upload its report
 
+Runnable copy: [`examples/run-mission-script.yml`](https://github.com/astro-tools/setup-gmat/blob/v0/examples/run-mission-script.yml)
+
 A workflow that installs GMAT, runs a `.script` mission file via `gmatpy.LoadScript` / `RunScript` from a small Python driver, then uploads the resulting report directory as a build artifact.
 
 The example uses the stock `samples/Ex_HighFidelitySRP.script` shipped inside the GMAT install, so the recipe runs as-is without any user-supplied script. Substitute your own `.script` path for real mission analysis.
