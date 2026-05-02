@@ -1,5 +1,5 @@
 name: 'Setup GMAT'
-description: 'Install NASA GMAT and bootstrap gmatpy for use in CI.'
+description: 'Install NASA GMAT (R2022a/R2025a/R2026a) on Linux, Windows, and macOS, with gmatpy bootstrap for CI.'
 author: 'astro-tools'
 
 branding:

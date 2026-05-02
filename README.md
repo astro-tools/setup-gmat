@@ -1,6 +1,6 @@
 # setup-gmat
 
-GitHub Action for installing [NASA GMAT](https://gmat.gsfc.nasa.gov/) (General Mission Analysis Tool) and bootstrapping `gmatpy` in CI.
+GitHub Action for installing [NASA GMAT](https://gmat.gsfc.nasa.gov/) (General Mission Analysis Tool) on Linux, Windows, and macOS runners, with `gmatpy` bootstrapped for use in CI.
 
 ```yaml
 - uses: actions/setup-python@v5
@@ -11,6 +11,8 @@ GitHub Action for installing [NASA GMAT](https://gmat.gsfc.nasa.gov/) (General M
     version: R2026a
     cache: true
 ```
+
+> **Want the container instead of the action?** A canonical GMAT image is published at [`ghcr.io/astro-tools/gmat`](https://github.com/astro-tools/setup-gmat/pkgs/container/gmat) — see [Verifying images](#verifying-images) below.
 
 ## Status
 
