@@ -94,10 +94,10 @@ RUN apt-get update \
         git \
     && rm -rf /var/lib/apt/lists/*
 
-# pyenv pinned to v2.5.7. Tags on GitHub are mutable; pinning to the SHA
+# pyenv pinned to v2.6.28. Tags on GitHub are mutable; pinning to the SHA
 # prevents silent retargeting if the tag is ever moved.
 RUN git clone --no-checkout https://github.com/pyenv/pyenv.git "${PYENV_ROOT}" \
-    && git -C "${PYENV_ROOT}" checkout f216b4bfb1598347137ecb3c4a8f893baf9ea37f
+    && git -C "${PYENV_ROOT}" checkout 485090e7131630b191305316571c06e4ecac3a35
 
 ENV PATH="${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:${PATH}"
 
