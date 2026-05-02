@@ -64,8 +64,8 @@ See [Getting started → Calling gmatpy from your own steps](getting-started.md#
 
 The action is built around the `@actions/*` toolkit and assumes a runner-like environment (`RUNNER_TEMP`, `GITHUB_ENV`, `actions/cache`). It is not designed for direct local invocation.
 
-For local use, install GMAT directly from [SourceForge](https://sourceforge.net/projects/gmat/) and run `BuildApiStartupFile.py` against it manually. A canonical Docker image on GHCR is planned for **v0.3** but is not yet published.
+For local use, either install GMAT directly from [SourceForge](https://sourceforge.net/projects/gmat/) and run `BuildApiStartupFile.py` against it manually, or pull the canonical image from [`ghcr.io/astro-tools/gmat`](https://github.com/astro-tools/setup-gmat/pkgs/container/gmat) — it ships GMAT pre-installed with `gmatpy` importable from Python 3.10/3.11/3.12, so `docker run --rm ghcr.io/astro-tools/gmat:R2026a python -c 'import gmatpy'` works out of the box.
 
 ## Does setup-gmat verify the download?
 
-It checks the archive size against a hardcoded per-version minimum (e.g. ≈380 MiB for R2026a) before extraction, which catches truncated downloads and SourceForge HTML-mirror responses. It does **not** verify a checksum or signature — supply-chain hardening (cosign-signed Docker image, attested provenance) is on the v0.3 roadmap.
+It checks the archive size against a hardcoded per-version minimum (e.g. ≈380 MiB for R2026a) before extraction, which catches truncated downloads and SourceForge HTML-mirror responses. It does **not** verify an installer checksum or signature against the SourceForge download — there is no upstream-published checksum to compare against. The canonical Docker image is a separate trust path: every published `ghcr.io/astro-tools/gmat:Rxxxxa` digest is signed via cosign keyless OIDC and verifiable with the one-liner in the README. Attested SLSA provenance for the image is the remaining supply-chain item and is not yet wired up.

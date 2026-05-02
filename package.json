@@ -1,6 +1,6 @@
 {
   "name": "setup-gmat",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "GitHub Action to install NASA GMAT (General Mission Analysis Tool) and bootstrap gmatpy in CI.",
   "main": "dist/index.js",
