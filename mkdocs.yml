@@ -42,6 +42,7 @@ nav:
       - Run a mission script and upload its report: recipes/run-mission-script.md
       - Skip the GMAT install on docs-only changes: recipes/skip-on-docs.md
       - Validate against every GMAT version on every OS: recipes/multi-version.md
+      - Run jobs in the GMAT container image: recipes/docker.md
   - FAQ: faq.md
   - Troubleshooting: troubleshooting.md
 
