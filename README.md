@@ -102,7 +102,7 @@ Runnable workflow files live in [`examples/`](examples/) — one per recipe, rea
 - [`examples/multi-version.yml`](examples/multi-version.yml) — `{ubuntu, windows, macos} × {R2022a, R2025a, R2026a}` matrix.
 - [`examples/docker-mode.yml`](examples/docker-mode.yml) — run the job inside `ghcr.io/astro-tools/gmat:Rxxxxa` instead of using the action.
 
-The files live under `examples/` rather than `.github/workflows/` so GitHub does not auto-run them in this repo. Each one mirrors the corresponding [recipe page](https://astro-tools.github.io/setup-gmat/recipes/) in the docs.
+Each one mirrors the corresponding [recipe page](https://astro-tools.github.io/setup-gmat/recipes/) in the docs.
 
 ## Verifying images
 
