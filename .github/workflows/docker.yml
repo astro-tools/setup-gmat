@@ -63,10 +63,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     # Job-level (not workflow-level) so the token's elevated `packages: write`
-    # is scoped only to where it is needed.
+    # and the OIDC `id-token: write` (used by cosign keyless signing to
+    # exchange a workflow-issued token at Fulcio) are scoped only to where
+    # they are needed.
     permissions:
       contents: read
       packages: write
+      id-token: write
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.setup.outputs.matrix) }}
@@ -204,18 +207,72 @@ jobs:
       # Using `docker tag` + `docker push` (rather than a second
       # build-push-action invocation) guarantees the published image is
       # bit-identical to the image that just passed smoke.
+      #
+      # After each push we read the manifest digest from the registry via
+      # `docker buildx imagetools inspect` and emit `<repo>@sha256:<digest>`
+      # references on a step output. The next step signs by digest, not by
+      # tag — cosign's standard pattern, since signing the immutable manifest
+      # means a future re-push of the same tag against a different digest
+      # cannot inherit the signature. When `latest` shares a digest with the
+      # version tag (the LATEST_GMAT_VERSION cell), the dedup happens
+      # naturally below.
       - name: Push to GHCR
+        id: push
         shell: bash
         run: |
           set -euo pipefail
           src="gmat-smoke:${{ matrix.version }}"
           IFS=',' read -r -a release_tags <<< "${{ steps.tags.outputs.value }}"
+          declare -A digest_seen=()
+          digests=""
           for tag in "${release_tags[@]}"; do
             echo "::group::Push ${tag}"
             docker tag "$src" "$tag"
             docker push "$tag"
+            digest=$(docker buildx imagetools inspect "$tag" \
+              --format '{{.Manifest.Digest}}')
+            repo="${tag%:*}"
+            ref="${repo}@${digest}"
+            echo "Pushed ${tag} → ${ref}"
+            if [ -z "${digest_seen[$ref]:-}" ]; then
+              digest_seen[$ref]=1
+              digests="${digests}${ref}"$'\n'
+            fi
             echo "::endgroup::"
           done
+          {
+            echo 'digests<<EOF'
+            printf '%s' "$digests"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      # Pin to v3 (current major) per the issue. cosign-installer puts
+      # `cosign` on PATH for subsequent steps in this job.
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+
+      # Keyless OIDC signing: cosign exchanges the workflow's id-token for a
+      # short-lived Fulcio cert tied to this repo + workflow + ref, signs the
+      # image manifest, and uploads the signature as a sibling OCI artifact
+      # (no long-lived secrets). `--yes` skips the interactive Rekor prompt.
+      # Sequenced after smoke (earlier in this job) and after push, so a
+      # smoke or push failure aborts the job before any signature is issued.
+      - name: Sign images
+        shell: bash
+        env:
+          DIGESTS: ${{ steps.push.outputs.digests }}
+        run: |
+          set -euo pipefail
+          if [ -z "${DIGESTS//[[:space:]]/}" ]; then
+            echo "::error::No digests captured from push step"
+            exit 1
+          fi
+          while IFS= read -r ref; do
+            [ -z "$ref" ] && continue
+            echo "::group::Sign ${ref}"
+            cosign sign --yes "$ref"
+            echo "::endgroup::"
+          done <<< "$DIGESTS"
 
       # Print the labels of the just-pushed image so a release can be traced
       # back to its installer SHA from the action log without pulling.
