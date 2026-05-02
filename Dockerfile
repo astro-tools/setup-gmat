@@ -119,11 +119,13 @@ COPY --from=gmat-installer /staging/GMAT/${GMAT_VERSION} /opt/gmat
 # bakes in the staging path and gmatpy import fails cryptically at runtime.
 RUN cd /opt/gmat && python api/BuildApiStartupFile.py
 
-# A fresh image has no PYTHONPATH; the issue spec's `$GMAT_ROOT/api:$PYTHONPATH`
-# would expand to a trailing colon, which Python interprets as CWD on sys.path.
-# Set the path absolutely.
+# gmatpy ships at `<gmat_root>/bin/gmatpy/`, not under `api/` — `api/` carries
+# the load_gmat.py / BuildApiStartupFile.py entry scripts but the package
+# itself (and api_startup_file.txt) lives in bin/. PYTHONPATH set absolutely;
+# `$GMAT_ROOT/bin:$PYTHONPATH` would expand to a trailing colon on a fresh
+# image and put CWD on sys.path.
 ENV GMAT_ROOT=/opt/gmat \
-    PYTHONPATH=/opt/gmat/api
+    PYTHONPATH=/opt/gmat/bin
 
 # INSTALLER_SHA256 and ACTION_VERSION default to empty for local builds; the
 # publish workflow (#61) computes/passes them at build time.
