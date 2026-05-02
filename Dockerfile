@@ -69,6 +69,7 @@ FROM ubuntu:24.04 AS final
 ARG GMAT_VERSION
 ARG INSTALLER_SHA256=
 ARG ACTION_VERSION=
+ARG PYTHON_VERSIONS="3.12 3.11 3.10"
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYENV_ROOT=/opt/pyenv \
@@ -101,16 +102,32 @@ RUN git clone --no-checkout https://github.com/pyenv/pyenv.git "${PYENV_ROOT}" \
 
 ENV PATH="${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:${PATH}"
 
-# 3.12 listed first so `python` / `python3` resolve to the newest minor;
-# `python3.10` and `python3.11` shims still resolve to their own installs.
-RUN pyenv install "${PYTHON_310_VERSION}" \
-    && pyenv install "${PYTHON_311_VERSION}" \
-    && pyenv install "${PYTHON_312_VERSION}" \
-    && pyenv global \
-        "${PYTHON_312_VERSION}" \
-        "${PYTHON_311_VERSION}" \
-        "${PYTHON_310_VERSION}" \
-    && pyenv rehash
+# Install only the Pythons listed in PYTHON_VERSIONS, in the order given.
+# `pyenv global` is set in the same order, so the first listed minor becomes
+# `python` / `python3`. Default `"3.12 3.11 3.10"` keeps 3.12 as the image's
+# default `python`. Single-Python builds (e.g. PYTHON_VERSIONS=3.11) yield a
+# slim image where only that interpreter is on PATH.
+RUN <<'EOF'
+set -eu
+if [ -z "$(echo "$PYTHON_VERSIONS" | tr -d '[:space:]')" ]; then
+    echo "PYTHON_VERSIONS is empty; specify at least one of: 3.10 3.11 3.12" >&2
+    exit 1
+fi
+patches=""
+for minor in $PYTHON_VERSIONS; do
+    case "$minor" in
+        3.10) patches="$patches $PYTHON_310_VERSION" ;;
+        3.11) patches="$patches $PYTHON_311_VERSION" ;;
+        3.12) patches="$patches $PYTHON_312_VERSION" ;;
+        *) echo "Unsupported PYTHON_VERSIONS entry '$minor'; supported: 3.10 3.11 3.12" >&2; exit 1 ;;
+    esac
+done
+for patch in $patches; do
+    pyenv install "$patch"
+done
+pyenv global $patches
+pyenv rehash
+EOF
 
 COPY --from=gmat-installer /staging/GMAT/${GMAT_VERSION} /opt/gmat
 
