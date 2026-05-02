@@ -111,15 +111,79 @@ jobs:
           echo "value=$tags" >> "$GITHUB_OUTPUT"
           printf 'Tags:\n%s\n' "${tags//,/$'\n'}"
 
+      # Build into the runner's local docker daemon (load: true) under a
+      # throwaway tag so the smoke step below can `docker run` it before any
+      # registry interaction. The image is re-tagged and pushed only after
+      # smoke passes — see "Push to GHCR" below. Charter §4 v0.3 acceptance:
+      # "a non-zero exit blocks the release" (#62).
       - uses: docker/build-push-action@v6
         with:
           context: .
-          push: true
-          tags: ${{ steps.tags.outputs.value }}
+          load: true
+          tags: gmat-smoke:${{ matrix.version }}
           build-args: |
             GMAT_VERSION=${{ matrix.version }}
             INSTALLER_SHA256=${{ steps.sha.outputs.value }}
             ACTION_VERSION=${{ github.ref_name }}
+
+      # Run the smoke script under each pinned Python (3.10 / 3.11 / 3.12)
+      # inside the locally-tagged image. Any failure propagates verbatim into
+      # the workflow log (no piping/grep) and aborts the cell via `set -e`,
+      # which prevents the push step below from running. Sample is the
+      # smallest .script in samples/ that exercises the propagator
+      # (Ex_HighFidelitySRP.script, 1269 B in R2026a) — see #62.
+      - name: Smoke (gmatpy import + stock-sample propagation per Python)
+        shell: bash
+        env:
+          # Wall-clock RunScript() duration is the elapsed-time metric: GMAT
+          # Spacecraft objects retain script-time config after RunScript
+          # (the propagated state lives in the runtime sandbox and isn't
+          # readable via GetObject), so probing sat.GetField('A1ModJulian')
+          # or 'X' would still return the initial values. Wall-clock is the
+          # robust signal: combined with LoadScript()/RunScript() returning
+          # True it proves gmatpy executed the propagator end-to-end.
+          SMOKE_PY: |
+            import sys, os, time
+            import gmatpy as gmat
+            gmat.Setup('/opt/gmat/bin/api_startup_file.txt')
+            os.chdir('/opt/gmat/samples')
+            if not gmat.LoadScript('Ex_HighFidelitySRP.script'):
+                sys.exit('LoadScript failed')
+            t0 = time.perf_counter()
+            if not gmat.RunScript():
+                sys.exit('RunScript failed')
+            elapsed = time.perf_counter() - t0
+            if elapsed <= 0:
+                sys.exit(f'No elapsed time: {elapsed}')
+            print(
+                f'OK py{sys.version_info.major}.{sys.version_info.minor}: '
+                f'gmatpy import + RunScript in {elapsed:.4f}s'
+            )
+        run: |
+          set -euo pipefail
+          image="gmat-smoke:${{ matrix.version }}"
+          for py in 3.10 3.11 3.12; do
+            echo "::group::Smoke (Python ${py})"
+            docker run --rm "$image" "python${py}" -c "$SMOKE_PY"
+            echo "::endgroup::"
+          done
+
+      # Re-tag the smoke-tested local image to its release tag(s) and push.
+      # Using `docker tag` + `docker push` (rather than a second
+      # build-push-action invocation) guarantees the published image is
+      # bit-identical to the image that just passed smoke.
+      - name: Push to GHCR
+        shell: bash
+        run: |
+          set -euo pipefail
+          src="gmat-smoke:${{ matrix.version }}"
+          IFS=',' read -r -a release_tags <<< "${{ steps.tags.outputs.value }}"
+          for tag in "${release_tags[@]}"; do
+            echo "::group::Push ${tag}"
+            docker tag "$src" "$tag"
+            docker push "$tag"
+            echo "::endgroup::"
+          done
 
       # Print the labels of the just-pushed image so a release can be traced
       # back to its installer SHA from the action log without pulling.
