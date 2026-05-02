@@ -1,0 +1,22 @@
+# Companion to docs/recipes/docker.md — runs the job inside the
+# astro-tools/gmat base image instead of installing GMAT on a fresh runner.
+# GMAT_ROOT and PYTHONPATH are baked into the image, so no setup-gmat or
+# actions/setup-python step is needed.
+
+name: tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/astro-tools/gmat:R2026a
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install test dependencies
+        run: pip install pytest
+
+      - name: Run integration tests
+        run: pytest -m integration
