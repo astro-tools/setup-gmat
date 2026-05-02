@@ -5,8 +5,8 @@
 # Stage 1 downloads + extracts the upstream GMAT Linux tarball; stage 2 layers
 # pyenv-managed Pythons on top and bootstraps gmatpy. The image's contract is
 # the same as the Action's: GMAT installed correctly and `import gmatpy`
-# working in three pinned Pythons. Sibling astro-tools projects (gmat-run,
-# astro-validate) layer on top via FROM rather than being baked in here.
+# working in three pinned Pythons — nothing more. Downstream images layer on
+# top via FROM.
 
 ARG GMAT_VERSION=R2026a
 
